@@ -18,7 +18,7 @@ const productSeeder = (nombreInquilino) => {
     const values = productos.map(producto => `('${producto.nombre}', ${producto.precio})`).join(',');
 
     // Insertar los productos en la tabla 'productos'
-    connection.query(`INSERT INTO productos (nombre, precio) VALUES ${values}`, (err, results) => {
+    connection.query(`INSERT INTO ${nombreInquilino}.productos (nombre, precio) VALUES ${values}`, (err, results) => {
       if (err) {
         return reject(err);
       } else {
