@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const app = express();
 
+
 const PORT = process.env.PORT 
 
 
@@ -13,8 +14,8 @@ app.use(express.json());
 
 
 // Importar las rutas para los inquilinos
-const inquilinosRouter = require('../controllers/inquilinos');
-app.use('/inquilinos', inquilinosRouter);
+const routes = require('../routes/api');
+app.use('/', routes);
 
 // Manejador de errores para rutas no encontradas
 app.use((req, res, next) => {

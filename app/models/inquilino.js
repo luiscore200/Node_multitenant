@@ -60,6 +60,24 @@ class Inquilino {
       });
     });
   }
+
+
+
+static async index() {
+  return new Promise((resolve, reject) => {
+    connection.query('SELECT * FROM inquilinos ', (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          reject(new Error('No se encontró ningún inquilino con ese ID'));
+        } else {
+          resolve(results); // Retorna toda la información del inquilino
+        }
+      }
+    });
+  });
+}
 }
 
 module.exports = Inquilino;
