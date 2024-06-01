@@ -1,83 +1,107 @@
 const connection = require('../database/connection');
-
-
-connection.query(`
-  CREATE TABLE IF NOT EXISTS inquilinos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL UNIQUE
-  )
-`, (err) => {
-  if (err) {
-    console.error('Error al crear la tabla inquilinos:', err);
-  } else {
-    console.log('Tabla inquilinos creada o ya existente');
-  }
-});
-
+const bcrypt = require('bcrypt');
 
 class Inquilino {
-  constructor(nombre) {
-    this.nombre = nombre;
+  constructor() {}
+
+  static async crearTabla() {
+    try {
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS inquilinos (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          nombre VARCHAR(255) NOT NULL UNIQUE,
+          email VARCHAR(255) NOT NULL UNIQUE,
+          password VARCHAR(255) NOT NULL,
+          status BOOLEAN
+        )
+      `);
+      console.log('Tabla inquilinos creada o ya existente');
+    } catch (error) {
+      console.error('Error al crear la tabla inquilinos:', error);
+      throw error;
+    }
   }
 
-  static crear(nombre) {
-    return new Promise((resolve, reject) => {
-      connection.query('INSERT INTO inquilinos (nombre) VALUES (?)', [nombre], (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+
+  static async crear(nombre, email, password) {
+    try {
+      const hashedPassword = await hashPassword(password);
+      const [results] = await connection.execute('INSERT INTO inquilinos (nombre, email, password, status) VALUES (?, ?, ?, ?)', [nombre, email, hashedPassword, true]);
+      return results;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  static eliminar(id) {
-    return new Promise((resolve, reject) => {
-      connection.query('DELETE FROM inquilinos WHERE id = ?', [id], (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+  static async eliminar(id) {
+    try {
+      const [results] = await connection.execute('DELETE FROM inquilinos WHERE id = ?', [id]);
+      return results;
+    } catch (error) {
+      throw error;
+    }
   }
 
+   static async activar(id) {
+    try {
+      const [results] = await connection.execute('UPDATE inquilinos SET status = ? WHERE id = ?', [true, id]);
+      return results;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async desactivar(id) {
+    try {
+      const [results] = await connection.execute('UPDATE inquilinos SET status = ? WHERE id = ?', [false, id]);
+      return results;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   static async find(id) {
-    return new Promise((resolve, reject) => {
-      connection.query('SELECT * FROM inquilinos WHERE id = ?', [id], (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          if (results.length === 0) {
-            reject(new Error('No se encontró ningún inquilino con ese ID'));
-          } else {
-            resolve(results[0]); // Retorna toda la información del inquilino
-          }
-        }
-      });
-    });
+    try {
+      const [results] = await connection.execute('SELECT * FROM inquilinos WHERE id = ?', [id]);
+      if (results.length === 0) {
+        throw new Error('No se encontró ningún inquilino con ese ID');
+      }
+      return results[0];
+    } catch (error) {
+      throw error;
+    }
   }
 
-
-
-static async index() {
-  return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM inquilinos ', (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          reject(new Error('No se encontró ningún inquilino con ese ID'));
-        } else {
-          resolve(results); // Retorna toda la información del inquilino
-        }
+  static async findEmail(email) {
+    try {
+      const [results] = await connection.execute('SELECT * FROM inquilinos WHERE email = ?', [email]);
+      if (results.length === 0) {
+        throw new Error('No se encontró ningún inquilino con ese ID');
       }
-    });
-  });
+      return results[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async index(id) {
+    try {
+      const [results] = await connection.execute('SELECT * FROM inquilinos ');
+   
+      return results;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
+
+async function hashPassword(password) {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return hashedPassword;
+  } catch (error) {
+    throw new Error('Error al hashear la contraseña: ' + error.message);
+  }
 }
 
 module.exports = Inquilino;
