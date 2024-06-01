@@ -4,16 +4,25 @@
   const seedDatabase = require('../database/inquilino/seedDatabaseInquilino.js');
   const dropDatabase = require('../database/dropDatabase.js');
   const subdomains = require('../domains/updateDomains.js');
+  const {validateCreateUser} = require('../validators/userValidator.js');
   require('dotenv').config();
 
 
 
 
   exports.createInquilino = async (req, res) => {
-    const { nombre, email, password } = req.body;
+    
+    const validationError = validateCreateUser(req.body);
+    if (validationError) {
+        return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
+    }
+
+    const { nombre, email, password, role } = req.body;
     
     try {
-     const created = await Inquilino.crear(nombre, email, password);
+      await Inquilino.crearTabla();
+     const created = await Inquilino.crear(nombre, email, password, role);
+     await Inquilino.crearTabla();
      await createDatabase(nombre);
      await fixDatabase(nombre);
      await seedDatabase(nombre);
@@ -28,6 +37,7 @@
         id: finded.id,
         nombre: finded.nombre,
         email: finded.email,
+        role: finded.role,
         // Puedes incluir más campos del inquilino aquí si los deseas
       },
       dominio: `${nombre}.${main}`, // Reemplaza tudominio.com con tu dominio real
