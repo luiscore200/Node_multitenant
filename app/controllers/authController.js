@@ -20,7 +20,9 @@ exports.login = async (req, res) => {
         if (!usuario) {
             return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
         }
-
+        if (!usuario.status) {
+            return res.status(401).json({ mensaje: 'Este Usuario está desactivado, contáctese con el proveedor' });
+        }
         // Verificar si la contraseña es correcta
         const valid = await bcrypt.compare(password, usuario.password);
         if (!valid) {
@@ -28,7 +30,7 @@ exports.login = async (req, res) => {
         }
 
         // Si las credenciales son correctas, generar un token JWT
-        const payload = { id: usuario.id, email: usuario.email };
+        const payload = { id: usuario.id, email: usuario.email, role: usuario.role };
         const token = jwt.generateToken(payload, '1h');
         console.log("token: "+token);
 
@@ -36,7 +38,7 @@ exports.login = async (req, res) => {
         const dominio = `${usuario.nombre}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
-        res.json({ token, usuario: { id: usuario.id, email: usuario.email, dominio } });
+        res.json({ token, usuario: { id: usuario.id, email: usuario.email, role: usuario.role, dominio } });
    
     } catch (error) {
         console.error('Error en la autenticación:', error);
