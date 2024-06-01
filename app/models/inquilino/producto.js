@@ -14,13 +14,13 @@ const Producto = {
       }
 
       const query = `SELECT * FROM \`${tenantDb}\`.productos`;
-      connection.query(query, (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
+      connection.execute(query)
+        .then(([results]) => {
           resolve(results);
-        }
-      });
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   },
 };

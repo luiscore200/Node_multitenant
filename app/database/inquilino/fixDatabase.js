@@ -12,7 +12,7 @@ const createProductosTable = async (nombreInquilino) => {
     `;
 
     // Ejecutar la consulta
-    await connection.query(query);
+    await connection.execute(query);
 
     console.log('Tabla de productos creada exitosamente');
   } catch (error) {
