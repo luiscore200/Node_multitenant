@@ -12,7 +12,6 @@ router.post('/inquilino', inquilinosController.createInquilino);
 router.delete('/inquilino/:id', inquilinosController.deleteInquilino);
 
 //productos
-
 router.get('/productos', [checkDomain], productController.index);
 
 //auth

@@ -109,9 +109,9 @@ class Inquilino {
   static async findEmail(email) {
     try {
       const [results] = await connection.execute('SELECT * FROM inquilinos WHERE email = ?', [email]);
-      if (results.length === 0) {
-        throw new Error('No se encontró ningún inquilino con ese ID');
-      }
+     // if (results.length === 0) {
+       // throw new Error('No se encontró ningún inquilino con ese ID');
+     // }
       return results[0];
     } catch (error) {
       throw error;
