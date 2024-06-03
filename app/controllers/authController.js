@@ -32,13 +32,13 @@ exports.login = async (req, res) => {
         // Si las credenciales son correctas, generar un token JWT
         const payload = { id: usuario.id, email: usuario.email, role: usuario.role };
         const token = jwt.generateToken(payload, '1h');
-        console.log("token: "+token);
+        console.log("access_token: "+token);
 
         const mainDomain = process.env.MAIN_DOMAIN;
         const dominio = `${usuario.nombre}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
-        res.json({ token, usuario: { id: usuario.id, email: usuario.email, role: usuario.role, dominio } });
+        res.json({ access_token:token, user: { id: usuario.id, email: usuario.email, role: usuario.role, dominio } });
    
     } catch (error) {
         console.error('Error en la autenticación:', error);
