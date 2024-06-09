@@ -1,6 +1,6 @@
 const jwt = require('../models/jwt');
 const bcrypt = require('bcrypt');
-const Inquilino = require('../models/inquilino.js');
+const User = require('../models/inquilino.js');
 const {validateLogin} = require('../validators/authValidator.js');
 require('dotenv').config();
 
@@ -15,7 +15,7 @@ exports.login = async (req, res) => {
     const {email,password} = req.body;
    // return res.json(req.body);
     try {
-        const usuario = await Inquilino.findEmail(email);
+        const usuario = await User.find('email',email);
        // return res.json(usuario);
         if (!usuario) {
             return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
@@ -35,10 +35,10 @@ exports.login = async (req, res) => {
         console.log("access_token: "+token);
 
         const mainDomain = process.env.MAIN_DOMAIN;
-        const dominio = `${usuario.nombre}.${mainDomain}`;
+        const domain = `${usuario.domain}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
-        res.json({ access_token:token, user: { id: usuario.id, email: usuario.email, role: usuario.role, dominio } });
+        res.json({ access_token:token, user: { id: usuario.id,name:usuario.name, domain:usuario.domain, email: usuario.email, country:usuario.country, role: usuario.role},main_domain: domain });
    
     } catch (error) {
         console.error('Error en la autenticación:', error);

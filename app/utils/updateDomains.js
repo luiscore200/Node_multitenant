@@ -5,7 +5,7 @@ const Inquilino = require('../models/inquilino');
 const actualizarSubdominios = async () => {
   try {
     const inquilinos = await Inquilino.index();
-    const subdominios = inquilinos.map(inquilino => inquilino.nombre);
+    const subdominios = inquilinos.map(inquilino => inquilino.name);
 
     // Generar la ruta del archivo en la carpeta 'data'
     const filePath = path.join(__dirname, 'subdominios.json');

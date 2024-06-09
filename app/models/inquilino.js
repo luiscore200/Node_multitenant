@@ -1,30 +1,34 @@
 const connection = require('../database/connection');
 const bcrypt = require('bcrypt');
 
-class Inquilino {
+class User {
   constructor() {}
 
   static async crearTabla() {
     try {
       await connection.execute(`
-        CREATE TABLE IF NOT EXISTS inquilinos (
+        CREATE TABLE IF NOT EXISTS  users (
           id INT AUTO_INCREMENT PRIMARY KEY,
-          nombre VARCHAR(255) NOT NULL UNIQUE,
+          name VARCHAR(255) NOT NULL,
+          domain VARCHAR(255) NOT NULL UNIQUE,
+          phone VARCHAR(255 ) NOT NULL ,
           email VARCHAR(255) NOT NULL UNIQUE,
+          country VARCHAR(255) NOT NULL,
           password VARCHAR(255) NOT NULL,
-          status BOOLEAN,
+          status BOOLEAN NOT NULL,
           role VARCHAR(255) NOT NULL
         )
       `);
-      console.log('Tabla inquilinos creada o ya existente');
+      console.log('Tabla  users creada o ya existente');
     } catch (error) {
-      console.error('Error al crear la tabla inquilinos:', error);
+      console.error('Error al crear la tabla  users:', error);
       throw error;
     }
   }
 
 
-  static async crear(nombre, email, password, role) {
+  static async crear(name,domain, phone, email , country, password, role,  status) {
+    let localStatus;
     let localRole;
     let localPassword;
     try {
@@ -39,8 +43,15 @@ class Inquilino {
       }else{
         localPassword="password";
       }
+
+      if(status==true || status==false ){
+        localStatus = status;
+      }else{
+        localStatus = true;
+      }
+
       const hashedPassword = await hashPassword(localPassword);
-      const [results] = await connection.execute('INSERT INTO inquilinos (nombre, email, password, status, role) VALUES (?, ?, ?, ?, ?)', [nombre, email, hashedPassword, true, localRole]);
+      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role) VALUES (?,?, ?, ?, ?, ?, ?, ?)', [name, domain, phone, email, country, hashedPassword, localStatus, localRole]);
       return results;
     } catch (error) {
       throw error;
@@ -49,7 +60,7 @@ class Inquilino {
 
   static async eliminar(id) {
     try {
-      const [results] = await connection.execute('DELETE FROM inquilinos WHERE id = ?', [id]);
+      const [results] = await connection.execute('DELETE FROM  users WHERE id = ?', [id]);
       return results;
     } catch (error) {
       throw error;
@@ -57,48 +68,24 @@ class Inquilino {
   }
   
   
-  static async administrador(id) {
-    try {
-      const [results] = await connection.execute('UPDATE inquilinos SET role = ? WHERE id = ?', ["admin", id]);
-      return results;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  static async usuario(id) {
-    try {
-      const [results] = await connection.execute('UPDATE inquilinos SET role = ? WHERE id = ?', ["user", id]);
-      return results;
-    } catch (error) {
-      throw error;
-    }
-  }
   
 
-   static async activar(id) {
+  static async index() {
     try {
-      const [results] = await connection.execute('UPDATE inquilinos SET status = ? WHERE id = ?', [true, id]);
+      const [results] = await connection.execute('SELECT * FROM  users');
+      
       return results;
     } catch (error) {
       throw error;
     }
   }
 
-  static async desactivar(id) {
+ 
+  static async find(key, value) {
     try {
-      const [results] = await connection.execute('UPDATE inquilinos SET status = ? WHERE id = ?', [false, id]);
-      return results;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  static async find(id) {
-    try {
-      const [results] = await connection.execute('SELECT * FROM inquilinos WHERE id = ?', [id]);
+      const [results] = await connection.execute(`SELECT * FROM  users WHERE ${key} = ?`, [value]);
       if (results.length === 0) {
-        throw new Error('No se encontró ningún inquilino con ese ID');
+        throw new Error(`No se encontró ningún usuario con ${key} = ${value}`);
       }
       return results[0];
     } catch (error) {
@@ -106,28 +93,41 @@ class Inquilino {
     }
   }
 
-  static async findEmail(email) {
-    try {
-      const [results] = await connection.execute('SELECT * FROM inquilinos WHERE email = ?', [email]);
-     // if (results.length === 0) {
-       // throw new Error('No se encontró ningún inquilino con ese ID');
-     // }
-      return results[0];
-    } catch (error) {
-      throw error;
-    }
-  }
+  
+  
 
-  static async index(id) {
+  static async update(id, updates) {
     try {
-      const [results] = await connection.execute('SELECT * FROM inquilinos ');
-   
+      const fields = [];
+      const values = [];
+
+      // Iterar sobre las propiedades del objeto updates
+      for (const [key, value] of Object.entries(updates)) {
+        if (key === 'password') {
+          const hashedPassword = await hashPassword(value);
+          fields.push('password = ?');
+          values.push(hashedPassword);
+        } else {
+          fields.push(`${key} = ?`);
+          values.push(value);
+        }
+      }
+
+      values.push(id);
+
+      const sql = `UPDATE  users SET ${fields.join(', ')} WHERE id = ?`;
+
+      const [results] = await connection.execute(sql, values);
       return results;
     } catch (error) {
       throw error;
     }
   }
 }
+
+
+
+
 
 async function hashPassword(password) {
   try {
@@ -138,4 +138,4 @@ async function hashPassword(password) {
   }
 }
 
-module.exports = Inquilino;
+module.exports = User;

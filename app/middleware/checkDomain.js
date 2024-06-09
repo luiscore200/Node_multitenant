@@ -9,7 +9,7 @@ require('dotenv').config();
  * @param {Array} data - El resultado de ejecutar una expresión regular sobre una URL.
  * @returns {string|null} - El subdominio si existe, de lo contrario null.
  */
-const subdomainsFilePath = path.join(__dirname, '../domains/subdominios.json');
+const subdomainsFilePath = path.join(__dirname, '../utils/subdominios.json');
 
 const parseDomain = (data = []) => {
   try {
