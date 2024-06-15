@@ -4,9 +4,6 @@
   
   const dropDatabase = require('../database/dropDatabase.js');
   const subdomains = require('../utils/updateDomains.js');
-
-
-
   const {validateCreateUser,validateUpdateUser} = require('../validators/userValidator.js');
   require('dotenv').config();
 
@@ -55,6 +52,10 @@
       
     try {
       await User.crearTabla();
+    const aa = await User.find("email",email);
+     if(!!aa) return res.json({error:"Email ya ha sido tomado"});
+    const bb = await User.find("domain",domain);
+     if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
      const created = await User.crear(name, domain, phone, email, country, password, role, status);
      await createDatabase(domain);
      await fixDatabase(domain);
@@ -84,7 +85,6 @@
       res.status(201).send(respuesta);
     } catch (error) {
       console.error('Error al crear el Usuario:', error.message);
-      if(error.errno==1062)
       res.status(500).send({error:error.message});
     }
   };
@@ -102,6 +102,8 @@
 //        return res.json({mensaje:inquilino.name});
       await dropDatabase(user.domain);
     
+      }else{
+       return res.json({mensaje:"Usuario no encontrado"});
       }
       
     await User.eliminar(idUser);

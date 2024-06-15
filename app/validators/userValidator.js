@@ -49,7 +49,7 @@ exports.validateCreateUser = (data) => {
     if (typeof country !== 'string') {
         return { mensaje: 'El country debe ser una cadena de texto' };
     }
-    if (country.length < 6 || name.length > 60) {
+    if (country.length < 4 || name.length > 60) {
         return { mensaje: 'El country debe tener entre 6 y 60 caracteres' };
     }
 
@@ -139,7 +139,7 @@ exports.validateUpdateUser = (data) => {
     if (typeof country !== 'string') {
         return { mensaje: 'El country debe ser una cadena de texto' };
     }
-    if (country.length < 6 || name.length > 60) {
+    if (country.length < 4 || name.length > 60) {
         return { mensaje: 'El country debe tener entre 6 y 60 caracteres' };
     }
 
