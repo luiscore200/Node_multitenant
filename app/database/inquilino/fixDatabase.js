@@ -42,9 +42,10 @@ const createTables = async (nombreInquilino) => {
         id SERIAL PRIMARY KEY,
         tittle VARCHAR(100),
         price INTEGER,
+        country VARCHAR (255),
         image VARCHAR(255) DEFAULT NULL,
         numbers VARCHAR(20), 
-        prize_type VARCHAR(20) CHECK (prize_type IN ('premio_unico', 'oportunidades', 'anticipados')),
+        type VARCHAR(20) CHECK (type IN ('premio_unico', 'oportunidades', 'anticipados')),
         prizes JSON
       )
     `;

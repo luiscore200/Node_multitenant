@@ -84,9 +84,7 @@ class User {
   static async find(key, value) {
     try {
       const [results] = await connection.execute(`SELECT * FROM  users WHERE ${key} = ?`, [value]);
-      if (results.length === 0) {
-        throw new Error(`No se encontró ningún usuario con ${key} = ${value}`);
-      }
+    
       return results[0];
     } catch (error) {
       throw error;
