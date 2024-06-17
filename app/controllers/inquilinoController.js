@@ -12,7 +12,7 @@
   exports.indexUser = async (req, res) => {
 
    // El subdominio ya fue verificado por el middleware
-  
+   
     try {
       const usuarios = await User.index();
       const array=[];
@@ -103,13 +103,13 @@
       await dropDatabase(user.domain);
     
       }else{
-       return res.json({mensaje:"Usuario no encontrado"});
+       return res.json({error:"Usuario no encontrado"});
       }
       
     await User.eliminar(idUser);
     await subdomains();
 
-      res.send({mensaje:"El Usuario ha sido eliminado correctamente"});
+    return  res.send({mensaje:"El Usuario ha sido eliminado correctamente"});
     } catch (error) {
       console.error('Error al eliminar el usuario: ', error);
       res.status(500).send({error:error.message});

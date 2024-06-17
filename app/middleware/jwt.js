@@ -32,7 +32,7 @@ exports.verifytoken = async (req, res, next) => {
         if (!decodedToken) {
             return res.status(401).json({ error: 'Token inválido o expirado' });
         }
-     //   return res.json(decodedToken);
+      //  return res.json(decodedToken);
         req.decodedToken = decodedToken;
         next();
     } catch (error) {

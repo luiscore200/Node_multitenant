@@ -8,15 +8,19 @@ const {validateUpdateRifa} = require("../../validators/rifaValidator")
 
 
 exports.store = async (req, res) => {
+   
     //validaciones
     const {rifa,premios}=req.body;
+    const{decodedToken}= req;
+    
+    //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
   
     const premios2 = rifa.tipo=="anticipados"? premios.map(obj => ({ ...obj })).reverse(): premios;
     console.log(premios2);
 
     try{
         
-        const response=  await Rifa.store("numero1Dominio",rifa.titulo, rifa.precio,rifa.pais,rifa.numeros,rifa.tipo,premios2);
+        const response=  await Rifa.store(decodedToken? decodedToken.dominio:"numero1Dominio",rifa.titulo, rifa.precio,rifa.pais,rifa.numeros,rifa.tipo,premios2);
         return res.json({mensaje:"rifa creada con exito"});
     }catch(e){
         console.log(e.message);
@@ -27,9 +31,14 @@ exports.store = async (req, res) => {
 
 }
 exports.index = async (req,res)=>{
+    const{decodedToken}= req;
+//return res.json({error:"aswdasdsad"});
+   
+    
+//    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
     try{
 
-        const index = await Rifa.index("numero1Dominio");
+        const index = await Rifa.index(decodedToken? decodedToken.dominio:"numero1Dominio");
         const array=[];
         index.forEach(item => 
              
@@ -63,16 +72,19 @@ exports.index = async (req,res)=>{
 }
 
 exports.delete  = async(req,res)=>{
-    const id= req.params.id
+    const id= req.params.id;
+    const{decodedToken}= req;
+ 
+    //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
    try{
-    const aa= await Rifa.find("numero1Dominio","id",id);
-    if(!aa){  return res.json({mensaje:"objeto no encontrado"});}
+    const aa= await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
+    if(!aa){  return res.json({error:"objeto no encontrado"});}
     const dd = Rifa.eliminar("numero1Dominio",id);
     return res.json({mensaje:"Rifa eliminada con exito"});
    }catch(error)
    {
     console.log(error);
-    return res.json({message:error});
+    return res.json({error:error});
    }
 }
 
@@ -96,6 +108,9 @@ exports.update = async (req, res) => {
     const validateFields = ['titulo','id', 'precio', 'tipo', 'pais', 'numeros', 'premios'];
     const { id } = req.params;
     const update = req.body;
+    const{decodedToken}= req;
+    
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
     // Validar los campos recibidos
     const invalidFields = Object.keys(update).filter(key => !validateFields.includes(key));
@@ -128,7 +143,7 @@ exports.update = async (req, res) => {
     }
 
     try {
-        const response = await Rifa.update("numero1Dominio", id, updates);
+        const response = await Rifa.update(decodedToken? decodedToken.dominio:"numero1Dominio", id, updates);
         if (response.affectedRows === 0) {
             return res.status(404).json({ mensaje: "No se encontró la rifa para actualizar" });
         }
