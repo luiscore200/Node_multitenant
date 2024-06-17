@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
         }
 
         // Si las credenciales son correctas, generar un token JWT
-        const payload = { id: usuario.id, email: usuario.email, role: usuario.role };
+        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role, };
         const token = jwt.generateToken(payload, '1h');
         console.log("access_token: "+token);
 
@@ -46,7 +46,7 @@ exports.login = async (req, res) => {
    
     } catch (error) {
         console.error('Error en la autenticación:', error);
-        res.status(500).json({ mensaje: 'Error en la autenticación' });
+        res.status(500).json({ error: 'Error en la autenticación' });
     }
 };
 
@@ -66,7 +66,7 @@ exports.register = async (req, res) => {
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, status);
+     const created = await User.crear(name, domain, phone, email, country, password, role, true);
      await createDatabase(domain);
      await fixDatabase(domain);
 

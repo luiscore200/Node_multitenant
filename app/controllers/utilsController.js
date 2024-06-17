@@ -1,6 +1,7 @@
 const connection = require('../database/connection');
 
 exports.indexPhone = async (req, res) => {
+
     try {
         // Consulta para seleccionar todos los datos de la tabla `phone_codes`
         const [rows, fields] = await connection.execute('SELECT * FROM phone_codes');
