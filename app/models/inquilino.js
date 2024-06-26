@@ -15,8 +15,9 @@ class User {
           email VARCHAR(255) NOT NULL UNIQUE,
           country VARCHAR(255) NOT NULL,
           password VARCHAR(255) NOT NULL,
-          status BOOLEAN NOT NULL,
-          role VARCHAR(255) NOT NULL
+          status BOOLEAN NOT NULL  DEFAULT '0',
+          role VARCHAR(255) NOT NULL  DEFAULT 'user' CHECK (role IN ('user', 'admin')), 
+          payed BOOLEAN NOT NULL DEFAULT '0'
         )
       `);
       console.log('Tabla  users creada o ya existente');
@@ -27,10 +28,11 @@ class User {
   }
 
 
-  static async crear(name,domain, phone, email , country, password, role,  status) {
+  static async crear(name,domain, phone, email , country, password, role,  status, payed) {
     let localStatus;
     let localRole;
     let localPassword;
+    let localPayed;
     try {
       if(role && role=="admin"||role=="user"){
         localRole=role;
@@ -49,9 +51,15 @@ class User {
       }else{
         localStatus = true;
       }
+      if(payed==true || payed==false ){
+        localPayed = payed;
+      }else{
+        localPayed = true;
+      }
 
       const hashedPassword = await hashPassword(localPassword);
-      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role) VALUES (?,?, ?, ?, ?, ?, ?, ?)', [name, domain, phone, email, country, hashedPassword, localStatus, localRole]);
+      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
+         [name, domain, phone, email, country, hashedPassword, localStatus, "user", localPayed]);
       return results;
     } catch (error) {
       throw error;

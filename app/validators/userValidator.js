@@ -39,8 +39,8 @@ exports.validateCreateUser = (data) => {
     if (typeof phone !== 'string') {
         return { mensaje: 'El telefono debe ser una cadena de texto' };
     }
-    if (phone.length < 10 || name.length > 15) {
-        return { mensaje: 'El telefono debe tener entre 6 y 15 caracteres' };
+    if (phone.length < 8 || name.length > 15) {
+        return { mensaje: 'El telefono debe tener entre 8 y 15 caracteres' };
     }
 
     if (!country) {
@@ -83,7 +83,7 @@ exports.validateCreateUser = (data) => {
 ////////////////////////////////////////////////////
 
 exports.validateUpdateUser = (data) => {
-    const { name, email, password, status,phone, role,domain, country } = data;
+    const { name, email, password, status,phone, role,domain, country,payed } = data;
 
     if (name && typeof name !== 'string') {
         return { mensaje: 'El nombre debe ser una cadena de texto' };
@@ -123,8 +123,8 @@ exports.validateUpdateUser = (data) => {
     if (typeof phone !== 'string') {
         return { mensaje: 'El telefono debe ser una cadena de texto' };
     }
-    if (phone.length < 10 || name.length > 15) {
-        return { mensaje: 'El telefono debe tener entre 6 y 15 caracteres' };
+    if (phone.length < 8 || name.length > 15) {
+        return { mensaje: 'El telefono debe tener entre 8 y 15 caracteres' };
     }
     
 
@@ -141,6 +141,10 @@ exports.validateUpdateUser = (data) => {
     }
     if (country.length < 4 || name.length > 60) {
         return { mensaje: 'El country debe tener entre 6 y 60 caracteres' };
+    }
+    
+    if (typeof country !== 'boolean') {
+        return { mensaje: 'El campo payed debe ser un booleano' };
     }
 
     return null;

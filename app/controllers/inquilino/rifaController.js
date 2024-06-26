@@ -1,5 +1,6 @@
 const Rifa = require("../../models/inquilino/rifa");
-const {validateUpdateRifa} = require("../../validators/rifaValidator")
+const {validateUpdateRifa,validateCreateRifa, assignNumbersValidator} = require("../../validators/rifaValidator");
+const Asignaciones = require('../../models/inquilino/asiganciones');
 
 
 
@@ -14,6 +15,12 @@ exports.store = async (req, res) => {
     const{decodedToken}= req;
     
     //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+
+    const validationError = validateCreateRifa(update);
+    if (validationError) {
+        return res.status(400).json(validationError);
+    }
+
   
     const premios2 = rifa.tipo=="anticipados"? premios.map(obj => ({ ...obj })).reverse(): premios;
     console.log(premios2);
@@ -30,46 +37,39 @@ exports.store = async (req, res) => {
     
 
 }
-exports.index = async (req,res)=>{
-    const{decodedToken}= req;
-//return res.json({error:"aswdasdsad"});
-   
-    
-//    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
-    try{
-
-        const index = await Rifa.index(decodedToken? decodedToken.dominio:"numero1Dominio");
-        const array=[];
-        index.forEach(item => 
-             
-              {
-                const premios = JSON.parse(item.prizes);    
-                const premios2 = item.type=="anticipados"? premios.map(obj => ({ ...obj })).reverse(): premios;
-                const obj = {
-                    id: item.id,
-                    titulo: item.tittle,
-                    precio: item.price,
-                    pais: item.country,
-                    numeros:item.numbers,
-                    tipo:item.type,
-                    imagen:item.image,
-                    premios:premios2,
-                    
-
-                }
-                array.push(obj);
-              }
-             
-             
-          )
-
-    return res.json(array);
+exports.index = async (req, res) => {
+    const { decodedToken } = req;
+    try {
+        const rifas = await Rifa.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
         
-    }catch(e){
+        // Utiliza map para crear un array de promesas
+        const response = await Promise.all(rifas.map(async (item) => {
+
+            const totalAsignaciones = await Asignaciones.countByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio", item.id);
+          
+            const premios = JSON.parse(item.prizes);
+            const premios2 = item.type == "anticipados" ? premios.map(obj => ({ ...obj })).reverse() : premios;
+            return {
+                id: item.id,
+                titulo: item.tittle,
+                precio: item.price,
+                pais: item.country,
+                numeros: item.numbers,
+                tipo: item.type,
+                imagen: item.image,
+                premios: premios2,
+                asignaciones: totalAsignaciones,
+            };
+        }));
+
+        // Envía la respuesta con todos los resultados
+        return res.json(response);
+    } catch (e) {
         console.log(e.message);
-        return e.message;
+        return res.status(500).json({ error: e.message });
     }
 }
+
 
 exports.delete  = async(req,res)=>{
     const id= req.params.id;
@@ -153,3 +153,210 @@ exports.update = async (req, res) => {
         return res.status(500).json({ mensaje: "Error al actualizar la rifa" });
     }
 };
+
+exports.getNumeros = async (req, res) => {
+
+
+    const{decodedToken}= req;
+    
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+      
+
+    try {
+      const { id } = req.params;
+
+      await Asignaciones.eliminarAntiguasSeparadas(decodedToken? decodedToken.dominio:"numero1Dominio");
+      
+      const asignaciones = await Asignaciones.findByRaffle(decodedToken? decodedToken.dominio:"numero1Dominio",id);
+  
+      // Extraer los números ocupados
+      
+  
+      res.json(asignaciones);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error al obtener los números ocupados' });
+    }
+  };
+
+
+  
+  exports.assignNumbers = async (req, res) => {
+
+   // return res.json(req.body);
+    const{decodedToken}= req;
+    const{numbers,id_comprador,method}=req.body;
+    const { id } = req.params;
+
+    
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+    
+    const validationError = assignNumbersValidator(req.body);
+    if (validationError) {
+        return res.status(400).json(validationError);
+    }
+
+    try {
+        
+    const alreadyAssignedNumbers = [];
+
+    
+    for (const number of numbers) {
+      const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio", id, number);
+      if (existingNumber.length > 0) {
+        alreadyAssignedNumbers.push(number);
+      }
+    }
+
+   
+    if (alreadyAssignedNumbers.length > 0) {
+      return res.json({ error: `Los numeros ${alreadyAssignedNumbers.join(', ')} ya estan asignados` });
+    }
+    
+      const asignaciones = await Promise.all(numbers.map(async (number) => {
+        return await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio", id, number, "separado", id_comprador);
+      }));
+  
+      res.json({ mensaje: "Asignaciones agregadas con éxito" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message});
+    }
+  };
+  
+
+    
+  exports.getSeparados = async (req, res) => {
+    const{decodedToken}= req;
+    const { id } = req.params;
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+    
+    try {
+        await Asignaciones.eliminarAntiguasSeparadas(decodedToken ? decodedToken.dominio : "numero1Dominio");
+
+        const asignaciones = await Asignaciones.findSeparatedWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
+
+      return  res.json(asignaciones);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener los números separados' });
+    }
+      
+  };
+
+
+      
+  exports.eliminarSeparados = async (req, res) => {
+    const{decodedToken}= req;
+    const { id } = req.params;
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+    
+    try {
+
+        const a= Asignaciones.findByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+        if(a.length===0){
+            res.status(500).json({ error: 'Asignacion no encontrada' });
+        }
+
+        await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+
+        
+
+       return res.json({mensaje:"objeto eliminado con exito"});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al eliminar la asignacion' });
+    }
+      
+  };
+
+       
+  exports.confirmarSeparados = async (req, res) => {
+    const{decodedToken}= req;
+    const { id } = req.params;
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+  
+    try {
+        const a= Asignaciones.findByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+        if(a.length===0){
+            res.status(500).json({ error: 'Asignacion no encontrada' });
+        }
+           await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",id,{status:"pagado"});
+
+        
+
+         return res.json({mensaje:"objeto actualizado con exito"});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar el estado' });
+    }
+      
+  };
+
+  exports.actualizarGanador = async (req,res)=>{
+   
+    const { id } = req.params;
+    const update = req.body;
+    const{decodedToken}= req;
+   // return res.json(update);
+    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+
+
+    try {
+
+    const a= await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",id)
+    if(!a){return res.json({error:"rifa no encontrada"})}
+
+    const premios2 = a.type === "anticipado" ? update.map(obj => ({ ...obj })).reverse() : update;
+
+    const updates = {
+        prizes:JSON.stringify(premios2),
+    };
+//return res.json(updates);
+  
+   
+        const response = await Rifa.update(decodedToken? decodedToken.dominio:"numero1Dominio", id, updates);
+        if (response.affectedRows === 0) {
+            return res.status(404).json({ mensaje: "Algo salio mal durante la acutalizacion" });
+        }
+
+        return res.json({mensaje:"Ganador asignado con exito"});
+       
+    } catch (e) {
+        console.log(e.message);
+        return res.status(500).json({ error: "Error al actualizar el ganador" });
+    }
+
+
+
+  };
+
+  exports.rifaFind = async (req,res)=>{
+    const { id } = req.params;
+    const{decodedToken}= req;
+    
+    try{
+        const a= await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",id)
+        if(!a){return res.json({error:"rifa no encontrada"})}
+    
+    
+        const premios = JSON.parse(a.prizes);
+        const premios2 = a.type == "anticipados" ? premios.map(obj => ({ ...obj })).reverse() : premios;
+        const rifa= {
+            id: a.id,
+            titulo: a.tittle,
+            precio: a.price,
+            pais: a.country,
+            numeros: a.numbers,
+            tipo: a.type,
+            imagen: a.image,
+            premios: premios2,
+           
+        };
+        return res.json(rifa);
+    }catch(e){
+        return res.json({error:"Error al actualizar el item"});
+    }
+  };
+
+
