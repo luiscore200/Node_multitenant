@@ -143,7 +143,7 @@ exports.validateUpdateUser = (data) => {
         return { mensaje: 'El country debe tener entre 6 y 60 caracteres' };
     }
     
-    if (typeof country !== 'boolean') {
+    if (typeof payed !== 'boolean') {
         return { mensaje: 'El campo payed debe ser un booleano' };
     }
 

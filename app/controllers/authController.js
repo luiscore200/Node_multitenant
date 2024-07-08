@@ -1,6 +1,7 @@
 const jwt = require('../models/jwt');
 const bcrypt = require('bcrypt');
 const User = require('../models/inquilino.js');
+const Config = require('../models/inquilino/config.js');
 const {validateLogin} = require('../validators/authValidator.js');
 require('dotenv').config();
 const createDatabase = require('../database/createDatabase.js');
@@ -28,17 +29,6 @@ exports.login = async (req, res) => {
         }
 
       
-        if(status===true||status===false){
-            const payed = usuario2.payed==0?false:true;
-            if(status!==payed){
-               // console.log("necesita actualizar");
-                update(usuario2.id,status);
-            }
-            if(status===payed){
-                // console.log("no necesita actualizar");
-            }
-
-        }else{console.log("status no es booleano")};
 
         if (!usuario2.status) {
             return res.status(401).json({ error: 'Este Usuario está desactivado, contáctese con el proveedor' });
@@ -48,6 +38,20 @@ exports.login = async (req, res) => {
         if (!valid) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
+
+        
+        if(status===true||status===false){
+            const payed = usuario2.payed==0?false:true;
+            if(status!==payed){
+               // console.log("necesita actualizar");
+                update(usuario2,status);
+        
+            }
+            if(status===payed){
+                // console.log("no necesita actualizar");
+            }
+
+        }else{console.log("status no es booleano")};
 
         
 
@@ -150,9 +154,12 @@ exports.register = async (req, res) => {
      }
   }
 
-const update = async(id,boolean)=>{
+const update = async(usuario,boolean)=>{
     try{
-        const update = await User.update(id,{payed:boolean});
+        const update = await User.update(usuario.id,{payed:boolean});
+        if(boolean===false ){
+            const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false})
+        }
 
     }catch(e){
         throw "error al valorar la suscripcion";

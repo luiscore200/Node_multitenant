@@ -21,6 +21,21 @@ const createTables = async (nombreInquilino) => {
         document VARCHAR(20) NOT NULL
       )
     `;
+// Query para crear la tabla de configuración
+    const configQuery = `
+    CREATE TABLE IF NOT EXISTS ${nombreInquilino}.config (
+      id SERIAL PRIMARY KEY,
+      phone_verified BOOLEAN DEFAULT false,
+      phone_status BOOLEAN DEFAULT false,
+      email VARCHAR(100) NULL,
+      password_email VARCHAR(100) NULL,
+      email_status BOOLEAN DEFAULT false,
+      email_verified BOOLEAN DEFAULT false,
+      logo VARCHAR(255) NULL,
+      bussines_name VARCHAR(255) NULL
+    )
+  `;
+
 
     // Query para crear la tabla de asignaciones
     const asignacionQuery = `
@@ -51,11 +66,15 @@ const createTables = async (nombreInquilino) => {
       )
     `;
 
+    const configInsertQuery = `
+    INSERT INTO ${nombreInquilino}.config (phone_verified, phone_status, email, password_email, email_status,email_verified, logo, bussines_name)
+    VALUES (false, false, NULL, NULL, false, false, NULL, NULL)
+  `;
 
     const insert1= `
 INSERT INTO ${nombreInquilino}.purchaser (name, email, phone, document) VALUES 
-('luis corena', 'luis@example.com', '12347890', '334123456'),
-('Juan Pérez', 'juan.perez@example.com', '1234567890', '531123456');`;
+('luis corena', 'luis@example.com', '+57 3216396330', '334123456'),
+('Juan Pérez', 'juan.perez@example.com', '+57 3177229993', '531123456');`;
 
 const insert2= `
 INSERT INTO ${nombreInquilino}.raffle (tittle, price, country, image, numbers, type, prizes) VALUES 
@@ -91,10 +110,12 @@ INSERT INTO ${nombreInquilino}.assignament (id_raffle, number, status, id_purcha
     await connection.execute(compradorQuery);
     await connection.execute(asignacionQuery);
     await connection.execute(asignacionIndexQuery);
+    await connection.execute(configQuery)
     await connection.execute(rifaQuery);
     await connection.execute(insert1);
     await connection.execute(insert2);
     await connection.execute(insert3);
+    await connection.execute(configInsertQuery);
 
     console.log('Tablas creadas exitosamente');
   } catch (error) {

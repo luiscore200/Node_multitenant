@@ -1,7 +1,11 @@
 const Rifa = require("../../models/inquilino/rifa");
 const {validateUpdateRifa,validateCreateRifa, assignNumbersValidator} = require("../../validators/rifaValidator");
 const Asignaciones = require('../../models/inquilino/asiganciones');
+const sendMail = require('../../notifications/mailerService');
 
+const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero} = require('../../notifications/rifaMails');
+
+const whatsappService3 = require('../../notifications/whatsappService3');
 
 
 
@@ -203,7 +207,7 @@ exports.getNumeros = async (req, res) => {
     
     for (const number of numbers) {
       const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio", id, number);
-      if (existingNumber.length > 0) {
+      if (existingNumber) {
         alreadyAssignedNumbers.push(number);
       }
     }
@@ -214,7 +218,8 @@ exports.getNumeros = async (req, res) => {
     }
     
       const asignaciones = await Promise.all(numbers.map(async (number) => {
-        return await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio", id, number, "separado", id_comprador);
+        const asignacion =  await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio", id, number, "separado", id_comprador);
+        return asignacion;
       }));
   
       res.json({ mensaje: "Asignaciones agregadas con éxito" });
@@ -277,13 +282,19 @@ exports.getNumeros = async (req, res) => {
     // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
   
     try {
-        const a= Asignaciones.findByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
-        if(a.length===0){
-            res.status(500).json({ error: 'Asignacion no encontrada' });
+        const a= await Asignaciones.findById(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+        console.log(a);
+        if(!a){
+          return  res.status(500).json({ error: 'Asignacion no encontrada' });
         }
            await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",id,{status:"pagado"});
-
-        
+           const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",a.id_raffle);
+            console.log(rifa);
+      
+      sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+    
+   
+         sendMail.sendAll();
 
          return res.json({mensaje:"objeto actualizado con exito"});
     } catch (error) {
@@ -293,43 +304,113 @@ exports.getNumeros = async (req, res) => {
       
   };
 
-  exports.actualizarGanador = async (req,res)=>{
-   
+  exports.actualizarGanador = async (req, res) => {
     const { id } = req.params;
-    const update = req.body;
-    const{decodedToken}= req;
-   // return res.json(update);
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
-
+    const update = req.body.premios;
+    const index = req.body.index;
+    const { decodedToken } = req;
 
     try {
-
-    const a= await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",id)
-    if(!a){return res.json({error:"rifa no encontrada"})}
-
-    const premios2 = a.type === "anticipado" ? update.map(obj => ({ ...obj })).reverse() : update;
-
-    const updates = {
-        prizes:JSON.stringify(premios2),
-    };
-//return res.json(updates);
-  
-   
-        const response = await Rifa.update(decodedToken? decodedToken.dominio:"numero1Dominio", id, updates);
-        if (response.affectedRows === 0) {
-            return res.status(404).json({ mensaje: "Algo salio mal durante la acutalizacion" });
+        // Buscar la rifa por ID
+        const a = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", id);
+        if (!a) {
+            return res.json({ error: "Rifa no encontrada" });
         }
 
-        return res.json({mensaje:"Ganador asignado con exito"});
-       
+        // Preparar los premios para la actualización
+        const premios2 = a.type === "anticipado" ? update.map(obj => ({ ...obj })).reverse() : update;
+        const updates = {
+            prizes: JSON.stringify(premios2),
+        };
+
+        // Actualizar la rifa con los nuevos premios
+        const response = await Rifa.update(decodedToken ? decodedToken.dominio : "numero1Dominio", id, updates);
+        if (response.affectedRows === 0) {
+            return res.status(404).json({ mensaje: "Algo salió mal durante la actualización" });
+        }
+
+        // Buscar el ganador del número de la rifa
+        const ganador = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio", id, update[index].ganador);
+
+        // Agrupar las asignaciones por correo electrónico del comprador
+        const all = await Asignaciones.findAllWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
+        const agrupados = agruparPorUsuario(all);
+
+        // Mostrar los datos agrupados en la consola
+    //    console.log('Datos agrupados por correo electrónico:', agrupados);
+
+        for (const email in agrupados) {
+            const elementos = agrupados[email];
+            const pagados = elementos.filter(element => element.status === 'pagado');
+
+            if (ganador && email === ganador.purchaser_email && pagados.length > 0) {
+                const formattedPhoneNumber = ganador.purchaser_phone.replace(/^\+/, '').replace(/\s+/g, '');
+           
+          
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba1");
+      
+         // whatsappService3.addMessageToQueue("prueba2","573177229993","prueba2");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba11");
+         // whatsappService3.addMessageToQueue("prueba2","573177229993","prueba21");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba12");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba22");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba13");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba23");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba14");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba24");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba15");
+            whatsappService3.addMessageToQueue("prueba2","573177229993","prueba2");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba25");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba16");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba26");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba17");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba27");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba18");
+         // whatsappService3.addMessageToQueue("prueba2","573177229993","prueba28");
+          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba19");
+        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba29");
+      
+      
+          whatsappService3.sendAll();
+    //      await whatsappService3.sendMessage("prueba1","573177229993","ola3");
+  //         await whatsappService3.sendMessage("prueba2","573177229993","dios");
+//await whatsappService3.sendMessage("prueba1","573177229993","ola3");
+              //console.log(ee);
+
+            } else if (ganador && email === ganador.purchaser_email) {
+                
+           //     sendMail(email, "¡Tu número ha jugado!", rifaGanadorDeudor(ganador, update, index));
+
+                const formattedPhoneNumber = ganador.purchaser_phone.replace(/^\+/, '').replace(/\s+/g, '');
+               // await sendWhatsapp3(formattedPhoneNumber, "¡Tu número ha jugado!");
+            
+            } else {
+                const user = elementos[0];
+                sendMail(email, "Tu notificación de juego", rifaNoGanador(user, update, index));
+              const formattedPhoneNumber = user.purchaser_phone.replace(/^\+/, '').replace(/\s+/g, '');
+             
+                // await sendWhatsapp3(formattedPhoneNumber,"¡El premio acordado para la fecha de hoy de la rifa a la que estas suscrito acaba de jugar!"); 
+            }
+        }
+
+        return res.json({ mensaje: "Ganador asignado con éxito" });
+
     } catch (e) {
         console.log(e.message);
         return res.status(500).json({ error: "Error al actualizar el ganador" });
     }
+};
 
-
-
-  };
+// Función para agrupar asignaciones por correo electrónico del comprador
+const agruparPorUsuario = (items) => {
+    return items.reduce((acc, item) => {
+        if (!acc[item.purchaser_email]) {
+            acc[item.purchaser_email] = [];
+        }
+        acc[item.purchaser_email].push(item);
+        return acc;
+    }, {});
+};
 
   exports.rifaFind = async (req,res)=>{
     const { id } = req.params;

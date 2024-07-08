@@ -131,6 +131,7 @@ exports.updateUser = async (req, res) => {
     return res.status(400).json({ error: `Campos inválidos: ${invalidFields.join(', ')}` });
   }
 
+  
 
   const validationError = validateUpdateUser(updates);
   if (validationError) {

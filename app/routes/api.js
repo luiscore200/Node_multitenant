@@ -8,12 +8,14 @@ const authController = require('../controllers/authController');
 const utilsController = require('../controllers/utilsController');
 const rifaController = require('../controllers/inquilino/rifaController');
 const compradorController = require('../controllers/inquilino/compradorController');
+const configController = require('../controllers/inquilino/configController');
 
 // Inquilinos
 router.post('/user/store', userController.storeUser);
 router.delete('/user/delete/:id', userController.deleteUser);
 router.get('/user/index', userController.indexUser);
 router.put('/user/update/:id', userController.updateUser);
+
 
 
 
@@ -40,5 +42,12 @@ router.get('/rifa/find/:id',rifaController.rifaFind);
 //comprador 
 router.post('/comprador/store',compradorController.store);
 
+
+//config -inquilinos
+router.get('/user/config/sendQr', configController.sendQr);
+router.get('/user/config/verifyQr', configController.verifyConection);
+router.get('/user/config/export', configController.exportConfig);
+router.post('/user/config/verifyEmail', configController.verifyGmail);
+router.post('/user/config/saveConfig', configController.saveConfig);
 
 module.exports = router;

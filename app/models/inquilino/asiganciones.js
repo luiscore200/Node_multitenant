@@ -48,21 +48,77 @@ class Assignament {
         } catch (error) {
             throw error;
         }
+    } 
+    
+    static async findById(propietario, id) {
+        try {
+            const [results] = await connection.execute(
+                `SELECT 
+                a.id,
+                a.number,
+                a.status,
+                a.id_raffle,
+                p.id as purchaser_id,
+                p.name as purchaser_name,
+                p.email as purchaser_email,
+                p.phone as purchaser_phone
+                FROM ${propietario}.assignament a
+                JOIN ${propietario}.purchaser p ON a.id_purchaser = p.id
+                WHERE a.id= ? `,
+                [id]
+            );
+            return results.length > 0 ? results[0] : null;
+        } catch (error) {
+            throw error;
+        }
     }
-
     static async findNumberByRaffle(propietario, id_raffle, number) {
         try {
             const [results] = await connection.execute(
-                `SELECT * FROM ${propietario}.assignament WHERE id_raffle = ? AND number = ?`,
+                `SELECT 
+                a.id,
+                a.number,
+                a.status,
+                p.id as purchaser_id,
+                p.name as purchaser_name,
+                p.email as purchaser_email,
+                p.phone as purchaser_phone
+                FROM ${propietario}.assignament a
+                JOIN ${propietario}.purchaser p ON a.id_purchaser = p.id
+                WHERE a.id_raffle = ? AND a.number = ?`,
                 [id_raffle, number]
+            );
+            return results.length > 0 ? results[0] : null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async findAllWithPurchasers(propietario, id_raffle) {
+        try {
+            const [results] = await connection.execute(
+                `SELECT 
+                    a.id,
+                    a.number,
+                    a.status,
+                    p.id as purchaser_id,
+                    p.name as purchaser_name,
+                    p.email as purchaser_email,
+                    p.phone as purchaser_phone
+                 FROM ${propietario}.assignament a
+                 JOIN ${propietario}.purchaser p ON a.id_purchaser = p.id
+                 WHERE  a.id_raffle = ?`,
+                [id_raffle]
             );
             return results;
         } catch (error) {
             throw error;
         }
     }
-    
 
+
+    
 
     static async countByRaffle(propietario, id_raffle) {
         try {
