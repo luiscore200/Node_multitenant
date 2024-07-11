@@ -2,10 +2,11 @@ const Rifa = require("../../models/inquilino/rifa");
 const {validateUpdateRifa,validateCreateRifa, assignNumbersValidator} = require("../../validators/rifaValidator");
 const Asignaciones = require('../../models/inquilino/asiganciones');
 const sendMail = require('../../notifications/mailerService');
-
-const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero} = require('../../notifications/rifaMails');
-
+const sendMail2 = require('../../notifications/mailerService2');
+const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero} = require('../../notifications/plantillas/rifaMails');
+const rifaPlantillasWp = require('../../notifications/plantillas/rifaWp');
 const whatsappService3 = require('../../notifications/whatsappService3');
+const Config = require('../../models/inquilino/config');
 
 
 
@@ -282,6 +283,9 @@ exports.getNumeros = async (req, res) => {
     // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
   
     try {
+      const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
+     
+     // return res.json(conf);
         const a= await Asignaciones.findById(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
         console.log(a);
         if(!a){
@@ -290,11 +294,28 @@ exports.getNumeros = async (req, res) => {
            await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",id,{status:"pagado"});
            const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",a.id_raffle);
             console.log(rifa);
-      
-      sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
-    
-   
-         sendMail.sendAll();
+
+      if(conf){
+            if(conf.email_status===1 && conf.email_verified===1){
+              sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+              sendMail2.sendAll();
+            }
+            if(conf.email_status===0 || conf.email_verified===0){
+              sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+              sendMail.sendAll();
+            }
+            
+            if(conf.phone_status===1 && conf.phone_verified===1){
+           
+              whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a,rifa.prizes));
+              whatsappService3.sendAll();
+            }
+
+      }else{
+        sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+        sendMail.sendAll();
+      }
+     
 
          return res.json({mensaje:"objeto actualizado con exito"});
     } catch (error) {
@@ -311,6 +332,7 @@ exports.getNumeros = async (req, res) => {
     const { decodedToken } = req;
 
     try {
+      const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
         // Buscar la rifa por ID
         const a = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", id);
         if (!a) {
@@ -336,60 +358,95 @@ exports.getNumeros = async (req, res) => {
         const all = await Asignaciones.findAllWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
         const agrupados = agruparPorUsuario(all);
 
-        // Mostrar los datos agrupados en la consola
-    //    console.log('Datos agrupados por correo electrónico:', agrupados);
+     
 
+       const GanadorNumber= Number(update[index].ganador) ;
         for (const email in agrupados) {
             const elementos = agrupados[email];
-            const pagados = elementos.filter(element => element.status === 'pagado');
+            console.log(elementos);
+         
+            const pagado = elementos.filter(element => element.status === 'pagado' && element.number===GanadorNumber);
+            
+            console.log(pagado)
 
-            if (ganador && email === ganador.purchaser_email && pagados.length > 0) {
-                const formattedPhoneNumber = ganador.purchaser_phone.replace(/^\+/, '').replace(/\s+/g, '');
-           
-          
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba1");
-      
-         // whatsappService3.addMessageToQueue("prueba2","573177229993","prueba2");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba11");
-         // whatsappService3.addMessageToQueue("prueba2","573177229993","prueba21");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba12");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba22");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba13");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba23");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba14");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba24");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba15");
-            whatsappService3.addMessageToQueue("prueba2","573177229993","prueba2");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba25");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba16");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba26");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba17");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba27");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba18");
-         // whatsappService3.addMessageToQueue("prueba2","573177229993","prueba28");
-          whatsappService3.addMessageToQueue("prueba1","573216396330","prueba19");
-        //  whatsappService3.addMessageToQueue("prueba2","573177229993","prueba29");
-      
-      
-          whatsappService3.sendAll();
-    //      await whatsappService3.sendMessage("prueba1","573177229993","ola3");
-  //         await whatsappService3.sendMessage("prueba2","573177229993","dios");
-//await whatsappService3.sendMessage("prueba1","573177229993","ola3");
-              //console.log(ee);
-
-            } else if (ganador && email === ganador.purchaser_email) {
+            if (ganador && email === ganador.purchaser_email && pagado.length>0) {
+             
+              if(conf){
+                if(conf.email_status===1 && conf.email_verified===1){
+                  sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_email,"¡Has ganado!",rifaGanador(ganador,update,index));
+                  sendMail2.sendAll();
+                }
+                if(conf.email_status===0 || conf.email_verified===0){
+                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanador(ganador,update,index));
+                  sendMail.sendAll();
+                }
                 
-           //     sendMail(email, "¡Tu número ha jugado!", rifaGanadorDeudor(ganador, update, index));
+                if(conf.phone_status===1 && conf.phone_verified===1){
+                  whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_phone,rifaPlantillasWp.rifaGanadorWhatsApp(ganador,update,index))
+                  whatsappService3.sendAll();
+                }
+          
+                }else{
+                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanador(ganador,update,index));
+                  sendMail.sendAll();
+          
+                }
+           
 
-                const formattedPhoneNumber = ganador.purchaser_phone.replace(/^\+/, '').replace(/\s+/g, '');
-               // await sendWhatsapp3(formattedPhoneNumber, "¡Tu número ha jugado!");
+
+            } else if (ganador && email === ganador.purchaser_email  && pagado.length===0) {
+
+              if(conf){
+                if(conf.email_status===1 && conf.email_verified===1){
+                  sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_email,"¡Has ganado!",rifaGanadorDeudor(ganador,update,index));
+                  sendMail2.sendAll();
+                }
+                if(conf.email_status===0 || conf.email_verified===0){
+                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanadorDeudor(ganador,update,index));
+                  sendMail.sendAll();
+                }
+                
+                if(conf.phone_status===1 && conf.phone_verified===1){
+                  whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_phone,rifaPlantillasWp.rifaGanadorDeudorWhatsApp(ganador,update,index))
+                  whatsappService3.sendAll();
+                }
+          
+                }else{
+                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanadorDeudor(ganador,update,index));
+                  sendMail.sendAll();
+          
+                }
+       
             
             } else {
-                const user = elementos[0];
-                sendMail(email, "Tu notificación de juego", rifaNoGanador(user, update, index));
-              const formattedPhoneNumber = user.purchaser_phone.replace(/^\+/, '').replace(/\s+/g, '');
+
+              const obj = elementos[0];
+
+              if(conf){
+                if(conf.email_status===1 && conf.email_verified===1){
+                  sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",email,"¡Has ganado!",rifaNoGanador(obj,update,index));
+                  sendMail2.sendAll();
+                }
+                if(conf.email_status===0 || conf.email_verified===0){
+                  sendMail.addMessageToQueue(email,"¡Has ganado!",rifaNoGanador(obj,update,index));
+                  sendMail.sendAll();
+                }
+                
+                if(conf.phone_status===1 && conf.phone_verified===1){
+                  whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",obj.purchaser_phone,
+                    rifaPlantillasWp.rifaNoGanadorWhatsApp(obj,update,index))
+                  whatsappService3.sendAll();
+                }
+          
+                }else{
+                  sendMail.addMessageToQueue(email,"Tu notificacion de juego",rifaNoGanador(obj,update,index));
+                  sendMail.sendAll();
+          
+                }
+       
+              
              
-                // await sendWhatsapp3(formattedPhoneNumber,"¡El premio acordado para la fecha de hoy de la rifa a la que estas suscrito acaba de jugar!"); 
+
             }
         }
 

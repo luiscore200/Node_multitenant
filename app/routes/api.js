@@ -9,6 +9,10 @@ const utilsController = require('../controllers/utilsController');
 const rifaController = require('../controllers/inquilino/rifaController');
 const compradorController = require('../controllers/inquilino/compradorController');
 const configController = require('../controllers/inquilino/configController');
+const adminConfigController = require('../controllers/adminConfigController');
+
+
+
 
 // Inquilinos
 router.post('/user/store', userController.storeUser);
@@ -49,5 +53,9 @@ router.get('/user/config/verifyQr', configController.verifyConection);
 router.get('/user/config/export', configController.exportConfig);
 router.post('/user/config/verifyEmail', configController.verifyGmail);
 router.post('/user/config/saveConfig', configController.saveConfig);
+//config admin
+router.post('/admin/config/saveConfig',adminConfigController.uploadImages, adminConfigController.saveConfig);
+router.get('/admin/config/loadConfig',adminConfigController.index);
 
+router.get('/generalConfig',adminConfigController.generalConfig);
 module.exports = router;

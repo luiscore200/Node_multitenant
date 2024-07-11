@@ -110,11 +110,14 @@ exports.sendMessage = async (sessionId, to, message) => {
            // printQRInTerminal: true
         });
 
+        const Number = to.replace(/[^\d]/g, '');
+
+
         return new Promise((resolve, reject) => {
             sock.ev.on('connection.update', async (update) => {
                 const { connection,lastDisconnect } = update;
                 if (connection === 'open') {
-                    const jid = `${to}@s.whatsapp.net`;
+                    const jid = `${Number}@s.whatsapp.net`;
                     try {
                         await sendMessageWithTimeout(sock, jid, message);
                         console.log(`Mensaje enviado a ${to}`);

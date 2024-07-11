@@ -8,6 +8,11 @@ const dns = require('dns');
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY; // Debe ser 32 bytes
 const IV_LENGTH = 16; // Tamaño del vector de inicialización
 
+
+let messageQueue = [];
+let pendingMessages = [];
+let sending = false;
+
 // Función para cifrar un valor
 const encrypt = (text) => {
     let iv = crypto.randomBytes(IV_LENGTH);
@@ -58,6 +63,29 @@ const sendWithTimeout = (transporter, mailOptions, timeout = 10000) => {
 };
 
 
+const limpiarMensajesAntiguos = () => {
+    const unDia = 24 * 60 * 60 * 1000; // Milisegundos en un día
+    const ahora = Date.now();
+
+    messageQueue = messageQueue.filter(m => (ahora - m.createdAt) < unDia);
+    pendingMessages = pendingMessages.filter(m => (ahora - m.createdAt) < unDia);
+};
+
+const moverMensajesASesionPendiente = (domain) => {
+    const mensajesPendientes = messageQueue.filter(m => m.domain === domain);
+    pendingMessages.push(...mensajesPendientes.map(m => ({ ...m, createdAt: Date.now() })));
+    messageQueue = messageQueue.filter(m => m.domain !== domain);
+};
+
+// Función para eliminar el transporter existente del propietario
+const borrado = (propietario) => {
+    sessions = sessions.filter(sess => sess.propietario !== propietario);
+    actualizarJson();
+    console.log(`Transporter eliminado para ${propietario}.`);
+};
+
+
+
 
 // Ruta del archivo JSON
 const jsonFilePath = path.join(__dirname, '../utils/emailList.json');
@@ -94,6 +122,11 @@ const createTransporter = (email, password) => {
     });
 };
 
+exports.addMessageToQueue = (domain, to, subject, html) => {
+    messageQueue.push({ domain, to, subject, html, createdAt: Date.now()  });
+};
+
+
 // Función para enviar correos electrónicos
 exports.sendMail = async (propietario, to, subject, html) => {
     await verificarConexionInternet();
@@ -111,11 +144,12 @@ exports.sendMail = async (propietario, to, subject, html) => {
         transporterObj.transporter = createTransporter(transporterObj.email, transporterObj.password);
     }
 
-    const { transporter } = transporterObj;
+    const { transporter,email } = transporterObj;
 
     try {
         let mailOptions = {
-            from: process.env.EMAIL_FROM,
+           // from: process.env.EMAIL_FROM,
+           from:email,
             to,
             subject,
             html,
@@ -128,13 +162,17 @@ exports.sendMail = async (propietario, to, subject, html) => {
         return 'Correo enviado: ' + info.response;
     } catch (error) {
 
-        if (error.code && error.code === 'EAUTH' && error.responseCode === 535) {
+        if (error === 'No hay conexión a Internet'){
+            console.log(error);
+           throw error;
+         }else if (error.code && error.code === 'EAUTH' && error.responseCode === 535) {
             console.log('No estás autorizado para enviar correos electrónicos. Verifica tus credenciales o permisos.');
             // Aquí puedes agregar lógica adicional de notificación o manejo de errores
+            throw "No autorizado";
+        }else{
+             console.log(error.message);
+             throw "Error desconocido";
         }
-
-        console.error('Error al enviar el correo: ', error);
-        throw new Error('Error al enviar el correo');
     }
 };
 
@@ -150,12 +188,45 @@ const actualizarJson = () => {
     console.log('JSON actualizado:', jsonContent);
 };
 
-// Función para eliminar el transporter existente del propietario
-const borrado = (propietario) => {
-    sessions = sessions.filter(sess => sess.propietario !== propietario);
-    actualizarJson();
-    console.log(`Transporter eliminado para ${propietario}.`);
+
+exports.sendAll = async () => {
+    if (sending) {
+        return;
+    }
+
+    limpiarMensajesAntiguos();
+
+    sending = true;
+
+    setImmediate(async () => {
+        while (messageQueue.length > 0) {
+            const { domain, to, subject,html } = messageQueue[0];
+
+            try {
+                await exports.sendMail(domain, to, subject, html);
+                messageQueue.shift();
+            } catch (error) {
+                if (error === 'No hay conexión a Internet' ) {
+               
+                    console.log('Reintentando en 10 segundos...');
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                } else if (error === 'No autorizado') {
+                    console.log('Problema de sesión, reenviando al final de la cola.');
+                           console.log('Sesión inactiva o cerrada, moviendo el mensaje a pendientes.');
+                           moverMensajesASesionPendiente(domain);
+              
+                } else {
+                    console.log('Error desconocido, reintentando en 10 segundos...');
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                }
+            }
+        }
+
+        sending = false;
+    });
 };
+
+
 
 // Función para verificar y almacenar el transporter
 exports.verifyEmail = async (propietario, email, password) => {
@@ -187,4 +258,16 @@ exports.verifyEmail = async (propietario, email, password) => {
         borrado(propietario); // Eliminar el transporter en caso de error
         throw new Error("Error al confirmar");
     }
+};
+
+exports.sendPendings = async () => {
+    if (pendingMessages.length > 0) {
+        messageQueue.push(...pendingMessages);
+        pendingMessages = [];
+        await exports.sendAll();
+    }
+};
+
+exports.deletePendings = (domain) => {
+    pendingMessages = pendingMessages.filter(m => m.domain !== domain);
 };
