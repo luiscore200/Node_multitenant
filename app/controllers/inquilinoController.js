@@ -7,7 +7,7 @@
   const {validateCreateUser,validateUpdateUser} = require('../validators/userValidator.js');
   require('dotenv').config();
 
-  const validFields = ['name','domain', 'phone', 'email', 'country','password', 'status', 'role'];
+  const validFields = ['name','domain', 'phone', 'email', 'country','password', 'status', 'role', 'payed'];
   
   exports.indexUser = async (req, res) => {
 
@@ -25,7 +25,8 @@
         email:obj.email,
         country:obj.country,
         status: obj.status==1 ? 'Active':'Inactive',
-        role:obj.role
+        role:obj.role,
+        payed:obj.payed===1? true:false,
        }
        if(obj.role=="user"){  
         array.push(usuario);
@@ -48,7 +49,7 @@
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
     }
 
-    const { name, phone, email, password, role, status,domain, country } = req.body;
+    const { name, phone, email, password, role, status,domain, country,payed } = req.body;
       
     try {
       await User.crearTabla();
@@ -56,7 +57,7 @@
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, status);
+     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed);
      await createDatabase(domain);
      await fixDatabase(domain);
 
@@ -75,6 +76,7 @@
         email: finded.email,
         pais: finded.country,
         role: finded.role,
+        payed: finded.payed,
         // Puedes incluir más campos del inquilino aquí si los deseas
       },
 //      dominio: `${nombre}.${main}`, // Reemplaza tudominio.com con tu dominio real
@@ -129,6 +131,7 @@ exports.updateUser = async (req, res) => {
     return res.status(400).json({ error: `Campos inválidos: ${invalidFields.join(', ')}` });
   }
 
+  
 
   const validationError = validateUpdateUser(updates);
   if (validationError) {

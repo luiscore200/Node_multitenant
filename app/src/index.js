@@ -2,7 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const app = express();
-
+const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const HOST =  '0.0.0.0';
@@ -15,6 +15,10 @@ app.use(cors());
 
 // Middleware para procesar solicitudes JSON
 app.use(express.json());
+
+
+// Servir archivos estáticos (por ejemplo, imágenes)
+app.use('/src/images/admin/config', express.static(path.join(__dirname, '../src/images/admin/config')));
 
 
 // Importar las rutas para los inquilinos
