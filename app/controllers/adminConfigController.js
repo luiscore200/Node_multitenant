@@ -3,6 +3,8 @@ const fs = require('fs').promises;
 const path = require('path');
 const multer = require('multer');
 const Config = require('../models/config');
+require('dotenv').config();
+
 
 
 //multer Config
@@ -144,7 +146,7 @@ if(atributosCambiados.find(obj => obj==="app_name")){
 
 
 const baseUrl = 'http://192.168.1.83:3000'; // Reemplaza con tu URL base
-
+//const baseUrl =`${process.env.HOST}/${process.env.PORT}` ; // Reemplaza con tu URL base
 const processConfigForClient = (config, includePrivate = false) => {
   const processedConfig = {
     id: config.id,
@@ -193,7 +195,7 @@ exports.generalConfig = async (req, res) => {
     
     const processedConfig = processConfigForClient(config,false);
 
-    return res.json(processedConfig);
+    return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig});
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error al obtener la configuración.' });

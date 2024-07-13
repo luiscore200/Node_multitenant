@@ -7,6 +7,8 @@ const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero} = req
 const rifaPlantillasWp = require('../../notifications/plantillas/rifaWp');
 const whatsappService3 = require('../../notifications/whatsappService3');
 const Config = require('../../models/inquilino/config');
+const AdminConfig = require('../../models/config');
+const Inquilino = require('../../models/inquilino');
 
 
 
@@ -31,6 +33,15 @@ exports.store = async (req, res) => {
     console.log(premios2);
 
     try{
+
+      const user= await Inquilino.find("id",decodedToken? decodedToken.id:23);
+      const config= await AdminConfig.index();
+      const count = await Rifa.index(decodedToken? decodedToken.dominio:"numero1Dominio");
+      if(user.payed===0){
+        if(Number(update.numeros)>Number(config.raffle_number)){  return res.json({error:`el numero maximo de numeros para un no suscrito es ${config.raffle_number}`,code:1}) }
+        if(Number(config.raffle_count)<count.length){ return res.json({error:`el numero maximo de rifas para un no suscrito es ${config.raffle_count}`,code:2}) }
+      }
+
         
         const response=  await Rifa.store(decodedToken? decodedToken.dominio:"numero1Dominio",rifa.titulo, rifa.precio,rifa.pais,rifa.numeros,rifa.tipo,premios2);
         return res.json({mensaje:"rifa creada con exito"});
@@ -128,6 +139,16 @@ exports.update = async (req, res) => {
     if (validationError) {
         return res.status(400).json(validationError);
     }
+    try {
+        const user= await Inquilino.find("id",decodedToken? decodedToken.id:23);
+        const config= await AdminConfig.index();
+       // const count = await Rifa.index(decodedToken? decodedToken.dominio:"numero1Dominio");
+        if(user.payed===0){
+          if(Number(update.numeros)>Number(config.raffle_number)){  return res.json({error:`el numero maximo de numeros para un no suscrito es ${config.raffle_number}`,code:1}) }
+       //   if(Number(config.raffle_count)<count.length){ return res.json({error:`el numero maximo de rifas para un no suscrito es ${config.raffle_count}`}) }
+        }
+
+        
 
     // Invertir el array de premios si el tipo es "anticipado"
     const premios2 = update.tipo === "anticipado" ? update.premios.map(obj => ({ ...obj })).reverse() : update.premios;
@@ -147,7 +168,10 @@ exports.update = async (req, res) => {
         updates.prizes = JSON.stringify(premios2);
     }
 
-    try {
+   
+
+
+
         const response = await Rifa.update(decodedToken? decodedToken.dominio:"numero1Dominio", id, updates);
         if (response.affectedRows === 0) {
             return res.status(404).json({ mensaje: "No se encontró la rifa para actualizar" });
