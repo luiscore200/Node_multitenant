@@ -203,7 +203,7 @@ exports.rifaNoGanador = (user, premio, index) => {
 
 exports.rifaConfirmacionNumero = (asignacion, premios2) => {
   let premiosHTML = '';
-  const premios = JSON.parse(premios2);
+  const premios = premios2;
 
   if (Array.isArray(premios)) {
     premiosHTML = premios.map(premio => {

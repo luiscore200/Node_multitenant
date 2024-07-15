@@ -178,14 +178,24 @@ class Assignament {
 
     static async eliminarAntiguasSeparadas(propietario) {
         try {
-            const [results] = await connection.execute(
-                `DELETE FROM ${propietario}.assignament WHERE status = 'separado' AND created_at < NOW() - INTERVAL 1 DAY RETURNING *`
+            // Primero, seleccionamos las filas que serán eliminadas
+            const [rowsToDelete] = await connection.execute(
+                `SELECT * FROM ${propietario}.assignament WHERE status = 'separado' AND created_at < NOW() - INTERVAL 1 DAY`
             );
-            return results;
+    
+            if (rowsToDelete.length > 0) {
+                // Luego, eliminamos las filas seleccionadas
+                await connection.execute(
+                    `DELETE FROM ${propietario}.assignament WHERE status = 'separado' AND created_at < NOW() - INTERVAL 1 DAY`
+                );
+            }
+    
+            return rowsToDelete; // Retornamos las filas eliminadas
         } catch (error) {
             throw error;
         }
     }
+    
 }
 
 module.exports = Assignament;

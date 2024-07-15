@@ -57,7 +57,7 @@ Gracias por jugar con nosotros.
   
   
   exports.rifaConfirmacionNumeroWhatsApp = (asignacion, premios2) => {
-    const premios = JSON.parse(premios2);
+    const premios = premios2;
   let premiosTexto = '';
 
   if (Array.isArray(premios)) {

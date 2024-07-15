@@ -18,12 +18,13 @@ const Inquilino = require('../../models/inquilino');
 exports.store = async (req, res) => {
    
     //validaciones
+    const update = req.body;
     const {rifa,premios}=req.body;
     const{decodedToken}= req;
     
     //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
-    const validationError = validateCreateRifa(update);
+    const validationError = validateCreateRifa(req.body);
     if (validationError) {
         return res.status(400).json(validationError);
     }
@@ -34,7 +35,7 @@ exports.store = async (req, res) => {
 
     try{
 
-      const user= await Inquilino.find("id",decodedToken? decodedToken.id:23);
+      const user= await Inquilino.find("id",decodedToken? decodedToken.id:34);
       const config= await AdminConfig.index();
       const count = await Rifa.index(decodedToken? decodedToken.dominio:"numero1Dominio");
       if(user.payed===0){
@@ -63,7 +64,7 @@ exports.index = async (req, res) => {
 
             const totalAsignaciones = await Asignaciones.countByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio", item.id);
           
-            const premios = JSON.parse(item.prizes);
+            const premios = item.prizes;
             const premios2 = item.type == "anticipados" ? premios.map(obj => ({ ...obj })).reverse() : premios;
             return {
                 id: item.id,
@@ -323,21 +324,25 @@ exports.getNumeros = async (req, res) => {
             if(conf.email_status===1 && conf.email_verified===1){
               sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
               sendMail2.sendAll();
+             
             }
             if(conf.email_status===0 || conf.email_verified===0){
               sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
               sendMail.sendAll();
+             
             }
             
             if(conf.phone_status===1 && conf.phone_verified===1){
            
               whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a,rifa.prizes));
               whatsappService3.sendAll();
+              
             }
 
       }else{
         sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
         sendMail.sendAll();
+       
       }
      
 
