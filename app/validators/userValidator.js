@@ -39,7 +39,7 @@ exports.validateCreateUser = (data) => {
     if (typeof phone !== 'string') {
         return { mensaje: 'El telefono debe ser una cadena de texto' };
     }
-    if (phone.length < 8 || name.length > 15) {
+    if (phone.length < 8 || phone.length > 15) {
         return { mensaje: 'El telefono debe tener entre 8 y 15 caracteres' };
     }
 

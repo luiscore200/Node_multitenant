@@ -5,3 +5,4 @@ node_modules/
 
 #sesiones de wp
 app/notifications/sessions/
+.vercel
