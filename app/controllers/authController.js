@@ -76,12 +76,12 @@ exports.login = async (req, res) => {
 
 
 exports.register = async (req, res) => {
-    
+    console.log(req.body);
     const validationError = validateCreateUser(req.body);
     if (validationError) {
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
     }
-
+   
     const { name, phone, email, password, role, domain, country } = req.body;
       
     try {

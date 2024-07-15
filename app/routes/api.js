@@ -13,7 +13,7 @@ const adminConfigController = require('../controllers/adminConfigController');
 
 
 
-
+router.get('/hola', async(req,res)=>{ return res.json("holaaa"); });
 // Inquilinos
 router.post('/user/store', userController.storeUser);
 router.delete('/user/delete/:id', userController.deleteUser);
