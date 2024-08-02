@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom right, #6366F1, #EC4899);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        .header .icon {
+            height: 48px;
+            width: 48px;
+            color: #fff;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            color: #e5e7eb;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #333;
+            margin-top: 1rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card-body-hidden {
+           display: none;
+           
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            display: flex;
+        }
+        
+       
+        
+        .matrix {
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+        }
+        
+        .grid-row {
+            display: flex;
+        }
+        
+        .pagination {
+         
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+      
+        .pagination-item{
+
+        }
+        .pagination-item-text{
+            font-size: 15px;
+            font-weight: 300;
+            
+        }
+        .list-pagination {
+            padding: 10px;
+                background-color: white;
+                border-radius: 10px;
+                position: absolute;
+                width: 200px;
+                min-height: 200px;
+                max-height: 450px;
+                top: 40px;
+                right: -50px;
+                z-index: 999;
+                border: 1px solid #ccc;
+                box-shadow: 0px 2px 3.84px rgba(0, 0, 0, 0.25);
+                overflow: hidden;
+                cursor:pointer;
+
+        }
+        .list-pagination-hidden {
+            display: none;
+          
+        }
+        .cont_pageInfo {
+            position: relative;
+            border-color:#d1d5db;
+            
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 13px;
+            padding-right: 13px;
+            border-radius: 10px;
+           border-style:groove;
+           border-width: 1px;
+           
+        }
+        .pageInfo{
+            cursor: pointer;
+        }
+        
+        .list-pagination button {
+            display: block;
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #f0f0f0;
+            border: none;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .list-pagination button:hover {
+            background-color: #ccc;
+        }
+        
+        #matrix-container {
+            margin: 20px;
+            margin-top: 5px;
+            min-height: 300px;
+            min-width: 250px;
+            max-width: 100%;
+            max-height: 35vh;
+            overflow: auto;
+            box-sizing: border-box;
+        }
+
+
+        .cell, .assignedCell, .reservedCell, .selectedCell,.cell_hover {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 3.84px rgba(0, 0, 0, 0.25);
+    cursor:pointer;
+}
+
+.cell {
+    background-color: #e0e0e0;
+}
+
+.cell_hover {
+    background-color:#9ca3af;
+  
+}
+
+
+.assignedCell {
+    background-color: #ff6b6b;
+}
+
+.reservedCell {
+    background-color: #ffcc00;
+}
+
+.selectedCell {
+    background-color: #4caf50;
+}
+
+.cellText {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor:pointer;
+}
+.selectedNumbersContainer {
+            position: relative;
+            border-radius: 15px;
+            border-width: 1px;
+        
+            background-color: #fff;
+        
+           
+            padding-top: 10px;
+            padding-bottom: 10px;
+          
+        }
+
+        .legendContainer {
+            display: flex;
+            justify-content: space-evenly;
+            margin-bottom: 10px;
+        }
+
+        .legendItem {
+            display: flex;
+            align-items: center;
+        }
+
+        .legendColor {
+            height: 10px;
+            width: 10px;
+            margin-right: 10px;
+        }
+
+        .selectedNumbersRow {
+            display: flex;
+            justify-content:space-between;
+            min-height: 100px;
+            max-height: 100px;
+            margin: 0 10px;
+        }
+
+        .selectedNumbersTitle {
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .totalContainer {
+            margin-top: 10px;
+            margin-left: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .totalPrice {
+            font-weight: bold;
+            color: red;
+        }
+
+        .confirmButton {
+            background-color: #6366F1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border-color:#9ca3af;
+            margin-right: 10px;
+        }
+
+        .confirmButtonText {
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        .input-group{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .input{
+            width:90%;
+            margin-left: 5%;
+            margin-right: 5%;
+            margin-top: 10px;
+           
+            padding: 8px;
+            border-radius: 7px;
+            border-width: 1px;
+          }
+          .input_error{
+            width:90%;
+            margin-left: 5%;
+            margin-right: 5%;
+            margin-top: 10px;
+            border-color: red;
+            padding: 8px;
+            border-radius: 7px;
+            border-width: 1px;
+          }
+
+          .input-label{
+            margin-left: 5%;
+            font-size: 14px;
+          }
+          .span {
+            margin-left: 5%;
+            margin-right: 5%;
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+          }
+      
+        .message {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .note {
+            font-size: 14px;
+            color: #666;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                    <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+                </svg>
+                <h1 class="title">MegaWIN</h1>
+                <p class="subtitle">APP de rifas digitales</p>
+            </div>
+            <div class="card">
+                <div id="card-body-1" class="card-body">
+                
+                    <div id="matrix-pagination" style="margin: 20px;"></div>
+                    <div id="matrix-container"></div>
+                    <!-- SCRIPT_PLACEHOLDER -->
+                    <div class="selectedNumbersContainer">
+                        <div class="legendContainer">
+                            <div class="legendItem">
+                                <div class="legendColor" style="background-color: #ff6b6b;"></div>
+                                <span style="font-size: 14px;">Asignado</span>
+                            </div>
+                            <div class="legendItem">
+                                <div class="legendColor" style="background-color: #bdbdbd;"></div>
+                                <span style="font-size: 14px;">Disponible</span>
+                            </div>
+                            <div class="legendItem">
+                                <div class="legendColor" style="background-color: #ffcc00;"></div>
+                                <span style="font-size: 14px;">Separado</span>
+                            </div>
+                        </div>
+                        
+                        <div class="selectedNumbersRow">
+                            <span class="selectedNumbersTitle">Tus números</span>
+                            <div  id="selected-container"   style="border-width:0;display:flex;flex-direction: row; max-width:60%;overflow-x:auto;">
+                                <!-- Aquí va el contenido de ColumnGrid -->
+                            </div>
+                        </div>
+                        <div class="totalContainer">
+                            <div>
+                                <span>Precio total:</span>
+                                <span id="total-container" class="totalPrice">$ 0<!-- Aquí va el cálculo del precio total --></span>
+                            </div>
+                            <button id="confirm-button" class="confirmButton">
+                                <span class="confirmButtonText">Confirmar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="card-body-2" class="card-body-hidden">
+                  <div>
+                    <div class="input-group">
+                        <label for="name" class="input-label">Nombre: </label>
+                        <input id="name" class="input" type="text" >
+                        <span id="name-span"  class="span"></span>
+                        <label for="email" class="input-label">Correo: </label>
+                        <input id="email" class="input" type="email">
+                        <span id="email-span"  class="span"></span>
+                        <label for="tel" class="input-label">Telefono: </label>
+                        <input id="tel" class="input" type="tel">
+                        <span id="tel-span"  class="span"></span>
+                        <label for="identificacion" class="input-label">Identificacion: </label>
+                        <input id="identificacion" class="input" type="text" >
+                        <span id="identificacion-span" class="span"></span>
+                
+                 
+                   </div>
+                  <div style="display: flex;flex-direction: row;justify-content: space-between;">
+                    <button id="confirm-button-3" style="   
+                    background-color: #777d8b;
+                    margin-left: 5%;
+                    padding: 10px 16px;
+                    border-radius: 8px;
+                    border-width: 1px;
+                    border-color:#737a85;
+                    margin-right: 10px;">
+                    <span class="confirmButtonText"> Volver </span>
+                </button>
+                   <button id="confirm-button-2" class="confirmButton">
+                    <span class="confirmButtonText">Confirmar</span>
+                </button>
+               </div>
+            </div>
+                </div>
+                <div id="card-body-3" class="card-body-hidden">
+                   
+  <div style="
+    padding: 1.5rem; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 1rem; 
+    padding-top: 2rem; 
+    padding-bottom: 2rem;
+  ">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      style="
+        height: 3rem; 
+        width: 3rem; 
+        color: #10b981;
+      "
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="m9 12 2 2 4-4"></path>
+    </svg>
+    <h3 style="
+     
+      font-size: 1.5rem; 
+      font-weight: 500;
+    ">
+      Números asignados correctamente
+    </h3>
+  </div>
+  <div style="
+    padding: 1.5rem; 
+    text-align: center; 
+    color: #6b7280;
+  ">
+    <p>
+      Una vez confirme el pago al proveedor, puede contactarse con él para actualizar el estado de su selección.
+    </p>
+  </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

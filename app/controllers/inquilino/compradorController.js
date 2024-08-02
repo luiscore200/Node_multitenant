@@ -37,3 +37,34 @@ exports.store = async (req, res) => {
     
 
 }
+
+
+exports.index = async (req, res) => {
+   
+    // return res.json(req.body);
+ 
+ 
+     //validaciones
+   
+     const{decodedToken}= req;
+     
+     //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+     
+ 
+     try{
+        
+          
+       const index = await comprador.index(decodedToken?decodedToken.dominio:"numero1Dominio");
+      
+       console.log(index)
+       return res.json({mensaje:"Peticion aceptada con exito",compradores:index});
+        
+     }catch(e){
+         
+         console.log(e.message);
+     }
+     
+    
+     
+ 
+ }

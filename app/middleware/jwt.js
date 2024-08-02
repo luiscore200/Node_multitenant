@@ -34,6 +34,7 @@ exports.verifytoken = async (req, res, next) => {
         }
       //  return res.json(decodedToken);
         req.decodedToken = decodedToken;
+        req.catchToken = token;
         next();
     } catch (error) {
         console.error("Middleware token verification error:", error.message);

@@ -1,14 +1,18 @@
-const connection = require('../database/connection');
+ const connection = require('../database/connection');
 require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
 
 exports.indexPhone = async (req, res) => {
 
     try {
-        // Consulta para seleccionar todos los datos de la tabla `phone_codes`
-        const [rows, fields] = await connection.execute('SELECT * FROM phone_codes');
 
-        // Enviar los datos como respuesta
-        res.status(200).json(rows);
+        const filePath = path.join(__dirname, '../utils/phoneCodes.json');
+        const rows = fs.readFileSync(filePath, 'utf8');
+     
+      //  const [rows, fields] = await connection.execute('SELECT * FROM phone_codes');
+      
+        res.status(200).json(JSON.parse(rows));
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -42,3 +46,5 @@ exports.indexSub = async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+

@@ -87,3 +87,26 @@ Gracias por participar en nuestra rifa y ¡buena suerte!
 `;
   };
   
+  exports.invitacionRifaWhatsApp = (comprador, currentRifa, url) => {
+    const premios = currentRifa.prizes.map((premio, index) => {
+        return `🏆 *Premio ${index + 1}*: ${premio.descripcion} - ${premio.loteria} (Fecha: ${premio.fecha})`;
+    }).join('\n');
+
+   
+
+    return `
+*¡Hola ${comprador.name}!*
+
+Te invitamos a participar en nuestra emocionante rifa: *${currentRifa.tittle}* 🎉
+
+💵 *Precio*: ${currentRifa.price}
+🌍 *País*: ${currentRifa.country}
+${premios}
+
+Haz clic en el siguiente enlace para obtener más información y participar:
+
+🔗  ${url}
+
+¡No pierdas esta oportunidad de ganar increíbles premios!
+`;
+};

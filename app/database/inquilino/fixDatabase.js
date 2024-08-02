@@ -12,6 +12,16 @@ const createTables = async (nombreInquilino) => {
       )
     `;
 
+    const notificacionQuery = `
+    CREATE TABLE IF NOT EXISTS ${nombreInquilino}.notification (
+      id SERIAL PRIMARY KEY,
+      description VARCHAR(200),
+      type VARCHAR(100)  CHECK (type IN ('configuracion','suscripcion','sistema')),
+      code INTEGER,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+
     const configQuery = `
     CREATE TABLE IF NOT EXISTS ${nombreInquilino}.config (
       id SERIAL PRIMARY KEY,
@@ -88,6 +98,7 @@ const createTables = async (nombreInquilino) => {
     // Ejecutar las consultas
     await connection.execute(compradorQuery);
     await connection.execute(asignacionQuery);
+    await connection.execute(notificacionQuery);
     await connection.execute(configQuery);
     await connection.execute(rifaQuery);
     await connection.execute(insert1);
