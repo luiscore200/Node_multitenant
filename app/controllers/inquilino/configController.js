@@ -1,11 +1,14 @@
 const Email = require('../../notifications/mailerService');
 const whatsapp = require('../../notifications/whatsappService3');
+const whatsapp2 = require('../../notifications/whatsappService2');
 const qrcode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
 const Config = require("../../models/inquilino/config");
 const Email2 = require('../../notifications/mailerService2');
 const { validateConfigUpdate } = require('../../validators/configValidator');
+
+
 
 
 exports.sendQr = async (req, res) => {
@@ -23,9 +26,12 @@ exports.sendQr = async (req, res) => {
         if (fs.existsSync(qrPath)) {
             fs.unlinkSync(qrPath);
         }
+      //  await whatsapp.borrarQr(dominio);
+       // const qrString = await whatsapp.crearQr(dominio); // Suponiendo que crearQr devuelve el QR como string
 
-        // Crea el QR como imagen PNG
-        const qrString = await whatsapp.crearQr(dominio); // Suponiendo que crearQr devuelve el QR como string
+       await whatsapp2.clearSession(dominio);
+       const qrString =await whatsapp2.crearSession(dominio);
+     
         await qrcode.toFile(qrPath, qrString, { type: 'png' });
 
        
@@ -48,9 +54,16 @@ exports.verifyConection= async(req,res)=>{
 
     //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
     try{
-        await whatsapp.sendMessage(decodedToken?decodedToken.dominio:"numero1Dominio","333311232323","¡Hola este es un mensaje de prueba!")
-      //  await whatsapp.addMessageToQueue(decodedToken?decodedToken.dominio:"numero1Dominio","333311232323","¡Hola este es un mensaje de prueba!")
-      //  await whatsapp.sendAll();
+       //await whatsapp2.getContacts("numero1Dominio");
+       // await whatsapp2.sendMessage("numero1Dominio", '+57 3177229993', 'Hola, este es un mensaje de prueba!');
+
+    for (let index = 0; index < 24; index++) {
+         whatsapp2.addMessageToQueue("numero1Dominio",'+57 3216396330',"Hola, este es un mensaje de prueba");
+        
+    }
+    whatsapp2.sendAll();
+
+       // await whatsapp.sendMessage(decodedToken?decodedToken.dominio:"numero1Dominio","333311232323","¡Hola este es un mensaje de prueba!")
             return res.json({mensaje:"confirmacion completada"});
     }catch(e){
         return res.json({error:"ha ocurrido un error al confirmar"});
@@ -136,6 +149,15 @@ exports.saveConfig = async(req,res)=>{
     if(atributosCambiados.find(obj => obj==="phone_verified")){
         const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"phone_verified":update.phone_verified});
     }
+    if(atributosCambiados.find(obj => obj==="phone_verified") && atributosCambiados.find(obj => obj==="phone_status") ){
+        if(update.phone_verified===1 && update.phone_status===1){
+            //encender whatsapp
+            startWp(decodedToken?decodedToken.dominio:"numero1Dominio");
+        } 
+
+    }
+
+    
 
     if(atributosCambiados.find(obj => obj==="email")){
         const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"email":update.email});
@@ -152,6 +174,14 @@ if(atributosCambiados.find(obj => obj==="email_verified")){
     const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"email_verified":update.email_verified});
 }
 
+if(atributosCambiados.find(obj => obj==="email_verified") && atributosCambiados.find(obj => obj==="email_status") ){
+    if(update.email_verified===1 && update.email_status===1){
+        //encender email
+        startGmail(decodedToken?decodedToken.dominio:"numero1Dominio");
+    } 
+
+}
+
 
 
    
@@ -166,3 +196,12 @@ if(atributosCambiados.find(obj => obj==="email_verified")){
 };
 
 
+const startWp = async(propietario)=>{
+    
+    await whatsapp2.sendPendings(propietario);
+}
+
+const startGmail = async(propietario)=>{
+    
+    await Email2.sendPendings(propietario);
+}

@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const dns = require('dns');
+const notification = require('../models/inquilino/notificaciones');
+const config = require('../models/inquilino/config');
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY; // Debe ser 32 bytes
 const IV_LENGTH = 16; // Tamaño del vector de inicialización
@@ -214,6 +216,8 @@ exports.sendAll = async () => {
                     console.log('Problema de sesión, reenviando al final de la cola.');
                            console.log('Sesión inactiva o cerrada, moviendo el mensaje a pendientes.');
                            moverMensajesASesionPendiente(domain);
+                           closeService(domain);
+                           notificar(domain);
               
                 } else {
                     console.log('Error desconocido, reintentando en 10 segundos...');
@@ -271,3 +275,24 @@ exports.sendPendings = async () => {
 exports.deletePendings = (domain) => {
     pendingMessages = pendingMessages.filter(m => m.domain !== domain);
 };
+
+
+    
+const closeService = async(dominio)=>{
+    try {
+        
+        const updated = await config.update(dominio,{"email_status":false,"email_verified":false});
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const notificar = async(dominio)=>{
+    await notification.deleteOld(dominio);
+    await notification.deleteFrom(dominio,"code",302);
+    await notification.deleteFrom(dominio,"code",303);
+    await notification.store(dominio,{description:"Se ha desactivado Gmail por fallas de sesion, presione para configurar",type:"configuracion",code:302});
+    await notification.store(dominio,{description:"Se han encolado los mensajes, luego de un dia seran eliminados",type:"sistema",code:303});
+
+}

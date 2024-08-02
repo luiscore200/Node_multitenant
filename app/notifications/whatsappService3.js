@@ -10,6 +10,17 @@ let messageQueue = [];
 let pendingMessages = [];
 let sending = false;
 
+const customLogger = {
+    level: 'fatal',
+    fatal: (msg, ...args) => console.error('FATAL:', msg, ...args),
+    error: (msg, ...args) => console.error('ERROR:', msg, ...args),
+    warn: () => {}, // Ignorar logs de nivel warn
+    info: () => {}, // Ignorar logs de nivel info
+    debug: () => {}, // Ignorar logs de nivel debug
+    trace: () => {}, // Ignorar logs de nivel trace
+    child: () => customLogger // Devuelve el mismo logger para manejar sub-loggers
+};
+
 const verificarConexionInternet = async () => {
     return new Promise((resolve, reject) => {
         dns.lookup('google.com', (err) => {
@@ -64,7 +75,12 @@ exports.crearQr = async (sessionId) => {
 
     sock = makeWASocket({
         auth: state,
-        printQRInTerminal: false
+        printQRInTerminal: false,
+        syncFullHistory: false,
+        fireInitQueries: false,
+        shouldSyncHistoryMessage: (msg) => {  return false;  },
+        emitOwnEvents: false,
+        logger:customLogger
     });
 
     return new Promise((resolve, reject) => {
@@ -107,7 +123,12 @@ exports.sendMessage = async (sessionId, to, message) => {
 
         sock = clients[sessionId] || makeWASocket({
             auth: state,
-           // printQRInTerminal: true
+            printQRInTerminal: false,
+           syncFullHistory: false,
+           fireInitQueries: false,
+           shouldSyncHistoryMessage: (msg) => {  return false;  },
+           emitOwnEvents: false,
+           logger:customLogger
         });
 
         const Number = to.replace(/[^\d]/g, '');
@@ -215,22 +236,3 @@ exports.borrarQr = async (sessionId) => {
     });
 };
 
-exports.verificarConexion= async(sessionId)=>{
-    
-
-    try {
-        await verificarConexionInternet();
-
-        if (!await verificarSesionActiva(sessionId)) {
-            throw 'Sesión no existe';
- }
-
-        const { state } = await useMultiFileAuthState(path.join(__dirname, `./sessions/auth_info_${sessionId}`));
-
-        sock = clients[sessionId] || makeWASocket({
-            auth: state,
-           // printQRInTerminal: true
-        });
-
-    }catch(e){}
-};

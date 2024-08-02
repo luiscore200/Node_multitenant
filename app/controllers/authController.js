@@ -2,6 +2,7 @@ const jwt = require('../models/jwt');
 const bcrypt = require('bcrypt');
 const User = require('../models/inquilino.js');
 const Config = require('../models/inquilino/config.js');
+const Notificaciones = require("../models/inquilino/notificaciones.js")
 const {validateLogin} = require('../validators/authValidator.js');
 require('dotenv').config();
 const createDatabase = require('../database/createDatabase.js');
@@ -49,6 +50,11 @@ exports.login = async (req, res) => {
             }
             if(status===payed){
                 // console.log("no necesita actualizar");
+                if(payed===true){
+                    await Notificaciones.deleteFrom(dominio,"code",310);
+                }else{
+                    notificar(usuario2.domain);
+                }
             }
 
         }else{console.log("status no es booleano")};
@@ -136,7 +142,8 @@ exports.register = async (req, res) => {
             throw "no se ha podido obtener el status";
             }
          const data = await response.json();
-
+         console.log(data.results[0]);
+       //  console.log(data.result[0].subscription_id);
          if(!data.results[0]){
             return false;
          }else{
@@ -158,10 +165,22 @@ const update = async(usuario,boolean)=>{
     try{
         const update = await User.update(usuario.id,{payed:boolean});
         if(boolean===false ){
-            const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false})
+            const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false});
+            notificar(dominio);
+        }else{
+            await Notificaciones.deleteFrom(dominio,"code",310);
         }
 
     }catch(e){
         throw "error al valorar la suscripcion";
     }
+}
+
+
+const notificar = async(dominio)=>{
+    await Notificaciones.deleteOld(dominio);
+    await Notificaciones.deleteFrom(dominio,"code",310);
+    await Notificaciones.store(dominio,{description:"No se encuentra suscrito, presione aqui para saber mas mas informacion sobre las ventajas de nuestros productos",type:"suscripcion",code:310});
+   
+
 }

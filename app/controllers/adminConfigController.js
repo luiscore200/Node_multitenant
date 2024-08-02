@@ -55,7 +55,7 @@ exports.saveConfig = async(req,res)=>{
     
   try {
     
-//    console.log(update);
+    console.log(update);
     await Config.create();
     const conf=  await Config.index();
 

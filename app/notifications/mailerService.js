@@ -2,21 +2,43 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const dns = require('dns');
+const Config = require('../models/config');
+const notificaciones = require("../models/notificaciones");
 
 // Configura el transporte usando las variables de entorno para Mailtrap
 
 let messageQueue = [];
 
 let sending = false;
+let email;
+let transporter;
 
+const credentials = async () => {
+    try {
+        const response = await Config.index();
+        console.log(response);
+        email = response.email;
+        transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: response.email,
+                pass: response.email_password,
+            },
+        });
+    } catch (error) {
+        console.log('Error al obtener las credenciales: ', error);
+        throw error;
+    }
+};
 
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+if (!transporter) {
+    credentials().then(() => {
+        console.log('Credenciales cargadas y transporter inicializado.');
+    }).catch((error) => {
+        console.log('No se pudieron cargar las credenciales: ', error.message);
+    });
+}
+
 
 const verificarConexionInternet = async () => {
     return new Promise((resolve, reject) => {
@@ -58,12 +80,18 @@ const limpiarMensajesAntiguos = () => {
 
 // Función para enviar correos electrónicos
 exports.sendMail = async (to, subject, html) => {
+   
+
 
 
   try {
     await   verificarConexionInternet();
+
+    if (!transporter) {
+        await credentials();
+    }
     let mailOptions = {
-      from: process.env.EMAIL_FROM,
+      from: email,
       to,
       subject,
       html,
@@ -72,6 +100,7 @@ exports.sendMail = async (to, subject, html) => {
     let info = await sendWithTimeout(transporter,mailOptions,10000);
     console.log('Correo enviado: ' + info.response);
   } catch (error) {
+    console.log(error);
     //console.error('Error al enviar el correo: ', error);
          if (error === 'No hay conexión a Internet'){
             console.log(error);
@@ -111,6 +140,7 @@ exports.sendAll = async () => {
                 } else if (error === 'No autorizado') {
                     console.log('Problema de sesión, reenviando al final de la cola.');
                            console.log('No autorizado, se notificara y reintentara cada media hora....');
+                           notificar();
                            await new Promise(resolve => setTimeout(resolve, 1800000));
               
                 } else {
@@ -134,6 +164,9 @@ exports.addMessageToQueue = ( to, subject, html) => {
 // Función para enviar correos electrónicos con el QR en el cuerpo del mensaje
 exports.sendMailWithQR = async (to, subject, qrImagePath) => {
   try {
+    if (!transporter) {
+        await credentials();
+    }
       // Lee la imagen del QR como base64
       const qrImage = fs.readFileSync(qrImagePath, { encoding: 'base64' });
 
@@ -214,7 +247,7 @@ exports.sendMailWithQR = async (to, subject, qrImagePath) => {
       `;
 
       let mailOptions = {
-          from: process.env.EMAIL_FROM,
+          from: email,
           to,
           subject,
           html,
@@ -232,3 +265,14 @@ exports.sendMailWithQR = async (to, subject, qrImagePath) => {
       console.error('Error al enviar el correo: ', error);
   }
 };
+
+
+const notificar = async(dominio)=>{
+    await notificaciones.insert();
+    await notificaciones.deleteOld();
+    await notificaciones.deleteFrom("code",302);
+    await notificaciones.deleteFrom("code",303);
+    await notificaciones.store({description:"Se ha desactivado Gmail por fallas de sesion, presione para configurar",type:"configuracion",code:302});
+    await notificaciones.store({description:"Se han encolado los mensajes, luego de un dia seran eliminados",type:"sistema",code:303});
+
+}

@@ -8,12 +8,12 @@ class Rifa {
   
 
     
-  static async store(propietario, titulo, precio, pais, numeros, tipo, premios) {
+  static async store(propietario, titulo, precio, pais,imagen, numeros, tipo, premios) {
     
     try {
       const [results] = await connection.execute(
         `INSERT INTO ${propietario}.raffle (tittle, price, country, image, numbers, type, prizes) VALUES (?, ?, ?,?,?, ?, ?)`,
-        [titulo,precio, pais,"", numeros, tipo, JSON.stringify(premios)]
+        [titulo,precio, pais,imagen, numeros, tipo, JSON.stringify(premios)]
       );
       return results;
     } catch (error) {

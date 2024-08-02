@@ -203,7 +203,7 @@ exports.rifaNoGanador = (user, premio, index) => {
 
 exports.rifaConfirmacionNumero = (asignacion, premios2) => {
   let premiosHTML = '';
-  const premios = JSON.parse(premios2);
+  const premios = premios2;
 
   if (Array.isArray(premios)) {
     premiosHTML = premios.map(premio => {
@@ -292,4 +292,106 @@ exports.rifaConfirmacionNumero = (asignacion, premios2) => {
     </body>
     </html>
   `;
+};
+
+
+exports.rifaInvitacion = (comprador, currentRifa, url) => {
+  const premios = currentRifa.prizes.map(premio => {
+    return `
+      <li>
+        <strong>${premio.descripcion}</strong> - ${premio.loteria} (Fecha: ${premio.fecha})
+      </li>`;
+  }).join('');
+
+  return `
+ <html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      padding: 20px;
+      background: #4CAF50;
+      color: #fff;
+      border-radius: 10px 10px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .content p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .highlight {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: #007BFF;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      margin: 20px 0;
+    }
+    .button:hover {
+      background-color: #0056b3;
+    }
+    .footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      color: #777;
+      background: #f1f1f1;
+      border-radius: 0 0 10px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>¡¿Preparado para probar tu suerte?!</h1>
+    </div>
+    <div class="content">
+      <p>Te invitamos a participar en nuestra rifa: <strong>${currentRifa.tittle}</strong></p>
+      <p><strong>Detalles de la rifa:</strong></p>
+      <ul>
+        <li><strong>Precio:</strong> ${currentRifa.price}</li>
+        <li><strong>País:</strong> ${currentRifa.country}</li>
+        <li><strong>Números disponibles:</strong> ${currentRifa.numbers}</li>
+        <li><strong>Tipo:</strong> ${currentRifa.type}</li>
+        ${premios}
+      </ul>
+      <p>Haz clic en el siguiente botón para obtener más información y participar:</p>
+      <a href="${url}" class="button"><p style="color:white;">Participar en la rifa</p></a>
+      <p>¡No pierdas esta oportunidad de ganar increíbles premios!</p>
+    </div>
+    <div class="footer">
+      <p>Gracias por tu interés y ¡buena suerte!</p>
+    </div>
+  </div>
+</body>
+</html>`;
 };

@@ -19,6 +19,7 @@ app.use(express.json());
 
 // Servir archivos estáticos (por ejemplo, imágenes)
 app.use('/src/images/admin/config', express.static(path.join(__dirname, '../src/images/admin/config')));
+app.use('/src/images/user', express.static(path.join(__dirname, '../src/images/user')));
 
 
 // Importar las rutas para los inquilinos
