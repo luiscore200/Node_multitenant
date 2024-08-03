@@ -142,7 +142,7 @@ exports.register = async (req, res) => {
             throw "no se ha podido obtener el status";
             }
          const data = await response.json();
-         console.log(data.results[0]);
+        // console.log(data.results[0]);
        //  console.log(data.result[0].subscription_id);
          if(!data.results[0]){
             return false;

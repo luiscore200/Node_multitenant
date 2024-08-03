@@ -462,7 +462,7 @@ exports.getNumeros = async (req, res) => {
         }
            await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",id,{status:"pagado"});
            const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",a.id_raffle);
-           rifa.prizes = JSON.parse(rifa.prizes);
+        //   rifa.prizes = JSON.parse(rifa.prizes);
             console.log(rifa);
 
       if(conf){
