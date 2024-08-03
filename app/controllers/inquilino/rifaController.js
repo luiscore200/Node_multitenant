@@ -164,7 +164,7 @@ exports.index = async (req, res) => {
                 numeros: item.numbers,
                 tipo: item.type,
                 imagen:  item.image ? baseUrl + item.image.replace('..','').replace('..\\', '').replace(/\\/g, '/') : '',
-                premios: JSON.parse(premios2),
+                premios:premios2,
                 asignaciones: totalAsignaciones,
             };
         }));
