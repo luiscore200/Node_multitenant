@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/inquilino.js');
 const Config = require('../models/inquilino/config.js');
 const Notificaciones = require("../models/inquilino/notificaciones.js")
+const adminNotificaciones = require("../models/notificaciones.js")
 const {validateLogin} = require('../validators/authValidator.js');
 require('dotenv').config();
 const createDatabase = require('../database/createDatabase.js');
@@ -21,15 +22,14 @@ exports.login = async (req, res) => {
     const {email,password} = req.body;
    // return res.json(req.body);
     try {
-        const status= await subs(email);
+     
       
         const usuario2 = await User.find('email',email);
        // return res.json(usuario);
         if (!usuario2) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
-
-      
+     
 
         if (!usuario2.status) {
             return res.status(401).json({ error: 'Este Usuario está desactivado, contáctese con el proveedor' });
@@ -40,7 +40,10 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
 
-        
+        if(usuario2.role ==="user"){
+
+            const status= await subs(email);
+             
         if(status===true||status===false){
             const payed = usuario2.payed==0?false:true;
             if(status!==payed){
@@ -58,6 +61,12 @@ exports.login = async (req, res) => {
             }
 
         }else{console.log("status no es booleano")};
+            
+        }
+      
+      
+
+       
 
         
 
@@ -139,7 +148,9 @@ exports.register = async (req, res) => {
  
          if (!response.ok) {
              console.log(`Error ${response.status}: ${response.statusText}`);
-            throw "no se ha podido obtener el status";
+            await adminNotificaciones.deleteOld();
+            await adminNotificaciones.insert({description:"un usuario ha intentado verificar su suscripcion y el api de mercado pago ha fallado",type:"sistema",code:9999})
+            return false;
             }
          const data = await response.json();
         // console.log(data.results[0]);
@@ -157,7 +168,9 @@ exports.register = async (req, res) => {
          }
          
      } catch (error) {
-        throw "no se ha podido obtener el status";
+        await adminNotificaciones.deleteOld();
+        await adminNotificaciones.insert({description:"un usuario ha intentado verificar su suscripcion y el api de mercado pago ha fallado",type:"sistema",code:9999})
+        return false;
      }
   }
 
