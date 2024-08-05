@@ -294,7 +294,6 @@ exports.rifaConfirmacionNumero = (asignacion, premios2) => {
   `;
 };
 
-
 exports.rifaInvitacion = (comprador, currentRifa, url) => {
   const premios = currentRifa.prizes.map(premio => {
     return `
@@ -345,16 +344,20 @@ exports.rifaInvitacion = (comprador, currentRifa, url) => {
       color: #4CAF50;
       font-weight: bold;
     }
+    .button-container {
+      text-align: center;
+      margin: 20px 0;
+    }
     .button {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 12px 25px;
       color: #fff;
       background-color: #007BFF;
       text-align: center;
       text-decoration: none;
       border-radius: 5px;
       font-size: 16px;
-      margin: 20px 0;
+      transition: background-color 0.3s ease;
     }
     .button:hover {
       background-color: #0056b3;
@@ -385,7 +388,9 @@ exports.rifaInvitacion = (comprador, currentRifa, url) => {
         ${premios}
       </ul>
       <p>Haz clic en el siguiente botón para obtener más información y participar:</p>
-      <a href="${url}" class="button"><p style="color:white;">Participar en la rifa</p></a>
+      <div class="button-container">
+        <a href="${url}" class="button">Participar en la rifa</a>
+      </div>
       <p>¡No pierdas esta oportunidad de ganar increíbles premios!</p>
     </div>
     <div class="footer">
