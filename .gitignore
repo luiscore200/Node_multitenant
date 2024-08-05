@@ -9,3 +9,4 @@ app/notifications/sessions/
 
 vercel
 
+app/.env
