@@ -120,7 +120,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                     
                         try {
-                        const response = await fetch("http://192.168.1.83:3000/rifa/assignNumbers/"+raffleID, {
+                        const response = await fetch("http://206.189.233.111:3000/rifa/assignNumbers/"+raffleID, {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                     
                         try {
-                        const response = await fetch("http://192.168.1.83:3000/comprador/store", {
+                        const response = await fetch("http://206.189.233.111:3000/comprador/store", {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
