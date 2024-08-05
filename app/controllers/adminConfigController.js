@@ -150,7 +150,7 @@ if(atributosCambiados.find(obj => obj==="app_name")){
 
 
 
-const baseUrl = 'http://192.168.1.83:3000'; // Reemplaza con tu URL base
+const baseUrl = process.env.MAIN_DOMAIN; // Reemplaza con tu URL base
 //const baseUrl =`${process.env.HOST}/${process.env.PORT}` ; // Reemplaza con tu URL base
 const processConfigForClient = (config, includePrivate = false) => {
   const processedConfig = {

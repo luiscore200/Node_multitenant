@@ -15,9 +15,10 @@ const multer = require('multer');
 const fs = require('fs').promises;
 const fs2 = require("fs");
 const path = require('path');
+require('dotenv').config();
 
 
-const baseUrl = 'http://192.168.1.83:3000'
+const baseUrl = process.env.MAIN_DOMAIN;
 
 
 
