@@ -389,7 +389,7 @@ exports.rifaInvitacion = (comprador, currentRifa, url) => {
       </ul>
       <p>Haz clic en el siguiente botón para obtener más información y participar:</p>
       <div class="button-container">
-        <a href="${url}" class="button">Participar en la rifa</a>
+        <a href="${url}" class="button"><p style="color:white;">Participar en la rifa</p></a>
       </div>
       <p>¡No pierdas esta oportunidad de ganar increíbles premios!</p>
     </div>
