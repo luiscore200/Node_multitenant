@@ -170,7 +170,7 @@ exports.register = async (req, res) => {
      } catch (error) {
         await adminNotificaciones.deleteOld();
         await adminNotificaciones.insert({description:"un usuario ha intentado verificar su suscripcion y el api de mercado pago ha fallado",type:"sistema",code:9999});
-        console.error("Error en authController, subs:", error.message);
+        console.error("Error en authController, subs:", error);
         return false;
      }
   }
@@ -189,7 +189,7 @@ const update = async(usuario,boolean)=>{
      //   throw "error al valorar la suscripcion";
      await adminNotificaciones.deleteOld();
      await adminNotificaciones.insert({description:"el sistema ha intentado usar la funcion update en authController, pero este ha fallado, si el mensaje se vuelve recurrente contactar al soporte",type:"sistema",code:9998})
-     console.error("Error en authController, update:", error.message);
+     console.error("Error en authController, update:", error);
     }
 }
 
