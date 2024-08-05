@@ -33,7 +33,7 @@ exports.generateToken = async(req, res) => {
     const { users, tokens } = validationResult;
     const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
     const currentRifa =await Rifa.find(decodedToken?decodedToken.dominio:"numero1Dominio","id",id);
-    currentRifa.prizes = JSON.parse(currentRifa.prizes);
+  //  currentRifa.prizes = JSON.parse(currentRifa.prizes);
    // console.log(validationResult);
    //console.log(currentRifa);
    console.log(conf);
