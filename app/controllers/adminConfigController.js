@@ -4,6 +4,7 @@ const path = require('path');
 const multer = require('multer');
 const Config = require('../models/config');
 require('dotenv').config();
+const Notificaciones = require('../models/notificaciones');
 
 
 
@@ -79,6 +80,10 @@ exports.saveConfig = async(req,res)=>{
   if(atributosCambiados.find(obj => obj==="email_password")){
     const updated = await Config.update({"email_password":update.email_password});
 }
+if(atributosCambiados.find(obj => obj==="email")||atributosCambiados.find(obj => obj==="email_password")){
+  EmailService();
+}
+
 if(atributosCambiados.find(obj => obj==="raffle_count")){
   const updated = await Config.update({"raffle_count":update.raffle_count});
 }
@@ -203,3 +208,8 @@ exports.generalConfig = async (req, res) => {
 };
 
 
+const EmailService = async()=>{
+  await Notificaciones.deleteOld();
+  await Notificaciones.deleteFrom("code",302);
+  await Notificaciones.deleteFrom("code",303);
+}

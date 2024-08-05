@@ -574,11 +574,11 @@ exports.getNumeros = async (req, res) => {
 
               if(conf){
                 if(conf.email_status===1 && conf.email_verified===1){
-                  sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_email,"¡Has ganado!",rifaGanadorDeudor(ganador,update,index));
+                  sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_email,"¡Tu numero ha jugado!",rifaGanadorDeudor(ganador,update,index));
                   sendMail2.sendAll();
                 }
                 if(conf.email_status===0 || conf.email_verified===0){
-                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanadorDeudor(ganador,update,index));
+                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Tu numero ha jugado!",rifaGanadorDeudor(ganador,update,index));
                   sendMail.sendAll();
                 }
                 
@@ -588,7 +588,7 @@ exports.getNumeros = async (req, res) => {
                 }
           
                 }else{
-                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanadorDeudor(ganador,update,index));
+                  sendMail.addMessageToQueue(ganador.purchaser_email,"¡Tu numero ha jugado!",rifaGanadorDeudor(ganador,update,index));
                   sendMail.sendAll();
           
                 }
