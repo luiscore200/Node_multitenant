@@ -141,7 +141,7 @@ if(atributosCambiados.find(obj => obj==="app_name")){
     console.log(aa);
    // console.log('Banners:', images);
     
-    return res.json({ message: 'Configuración guardada correctamente.', images });
+    return res.json({ mensaje: 'Configuración guardada correctamente.', images });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error al guardar la configuración.' });
