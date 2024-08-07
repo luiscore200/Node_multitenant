@@ -187,6 +187,7 @@ const update = async(usuario,boolean)=>{
 
     }catch(e){
      //   throw "error al valorar la suscripcion";
+     await adminNotificaciones.insert();
      await adminNotificaciones.deleteOld();
      await adminNotificaciones.insert({description:"el sistema ha intentado usar la funcion update en authController, pero este ha fallado, si el mensaje se vuelve recurrente contactar al soporte",type:"sistema",code:9998})
      console.error("Error en authController, update:", error);
@@ -195,6 +196,7 @@ const update = async(usuario,boolean)=>{
 
 
 const notificar = async(dominio)=>{
+   
     await Notificaciones.deleteOld(dominio);
     await Notificaciones.deleteFrom(dominio,"code",310);
     await Notificaciones.store(dominio,{description:"No se encuentra suscrito, presione aqui para saber mas mas informacion sobre las ventajas de nuestros productos",type:"suscripcion",code:310});
