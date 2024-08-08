@@ -191,7 +191,7 @@ const update = async(usuario,boolean)=>{
      await adminNotificaciones.insert();
      await adminNotificaciones.deleteOld();
      await adminNotificaciones.store({description:"el sistema ha intentado usar la funcion update en authController, pero este ha fallado, si el mensaje se vuelve recurrente contactar al soporte",type:"sistema",code:9998})
-     console.error("Error en authController, update:", error);
+     console.error("Error en authController, update:", e);
     }
 }
 
