@@ -93,6 +93,26 @@ if(atributosCambiados.find(obj => obj==="raffle_number")){
 if(atributosCambiados.find(obj => obj==="app_name")){
   const updated = await Config.update({"app_name":update.app_name});
 }
+if(atributosCambiados.find(obj => obj==="banner_1")){
+  deleteImage(conf.banner_1);
+  const updated = await Config.update({"banner_1":update.banner_1});
+}
+if(atributosCambiados.find(obj => obj==="banner_2")){
+  deleteImage(conf.banner_2);
+  const updated = await Config.update({"banner_2":update.banner_2});
+}
+if(atributosCambiados.find(obj => obj==="banner_3")){
+  deleteImage(conf.banner_3);
+  const updated = await Config.update({"banner_3":update.banner_3});
+}
+if(atributosCambiados.find(obj => obj==="app_logo")){
+  deleteImage(conf.app_logo);
+  const updated = await Config.update({"app_logo":update.app_logo});
+}
+if(atributosCambiados.find(obj => obj==="app_icon")){
+  deleteImage(conf.app_icon);
+  const updated = await Config.update({"app_icon":update.app_icon});
+}
 
    
   

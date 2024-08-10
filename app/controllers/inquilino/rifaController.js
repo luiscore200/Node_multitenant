@@ -187,8 +187,10 @@ exports.delete  = async(req,res)=>{
    try{
     const aa= await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
     if(!aa){  return res.json({error:"objeto no encontrado"});}
+    deleteImage(aa.image);
     const dd = Rifa.eliminar("numero1Dominio",id);
     return res.json({mensaje:"Rifa eliminada con exito"});
+   
    }catch(error)
    {
     console.log(error);
@@ -208,12 +210,13 @@ exports.update = async (req, res) => {
         precio: 'price',
         pais: 'country',
         numeros: 'numbers',
+        imagen:'image',
         tipo: 'type',
         premios: 'prizes'
     };
     
 
-    const validateFields = ['titulo','id', 'precio', 'tipo', 'pais', 'numeros', 'premios'];
+    const validateFields = ['titulo','id', 'precio', 'tipo','imagen', 'pais', 'numeros', 'premios'];
     const { id } = req.params;
     const update = req.body;
     const{decodedToken}= req;
@@ -232,14 +235,8 @@ exports.update = async (req, res) => {
         return res.status(400).json(validationError);
     }
     try {
-        const user= await Inquilino.find("id",decodedToken? decodedToken.id:26);
-        const config= await AdminConfig.index();
-     
-        //restricciones --------- sujeto a cambios, por eso esta comentado
-       // if(user.payed===0){
-       //   if(Number(update.numeros)>Number(config.raffle_number)){  return res.json({error:`el numero maximo de numeros para un no suscrito es ${config.raffle_number}`,code:1}) }
-       //   if(Number(config.raffle_count)<count.length){ return res.json({error:`el numero maximo de rifas para un no suscrito es ${config.raffle_count}`}) }
-     //   }
+    
+    
 
      const rifa = await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
      if(!rifa){
@@ -291,6 +288,11 @@ exports.update = async (req, res) => {
       await deleteImage(path.join(__dirname, rifa.image));
       updates.image = relativeImagenPath;
     }
+  } 
+
+  if(update.imagen && update.imagen===""){
+    await deleteImage(rifa.image);
+    updates.image = "";
   }
 
   console.log(updates);
