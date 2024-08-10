@@ -73,11 +73,7 @@ const createTables = async (nombreInquilino) => {
 
     const insert2 = `
     INSERT INTO ${nombreInquilino}.raffle (tittle, price, country, image, numbers, type, prizes) VALUES 
-    ('Mi Primera Rifa', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]'),
-    ('Mi Primera Rifa 2', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]'),
-    ('Mi Primera Rifa 3', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]'),
-    ('Mi Primera Rifa 4', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]'),
-    ('Mi Primera Rifa 5', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]');
+    ('Mi Primera Rifa', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]');
   `;
 
     const insert3 = `

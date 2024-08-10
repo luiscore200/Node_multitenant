@@ -50,9 +50,7 @@ class Rifa {
         `SELECT * FROM ${propietario}.raffle WHERE ${key} = ?`,
         [value]
       );
-      if (results.length === 0) {
-        throw new Error(`No se encontró ninguna rifa con ${key} = ${value}`);
-      }
+      
       return results[0];
     } catch (error) {
       throw error;
