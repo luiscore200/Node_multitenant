@@ -5,6 +5,7 @@ const multer = require('multer');
 const Config = require('../models/config');
 require('dotenv').config();
 const Notificaciones = require('../models/notificaciones');
+const Email = require("../notifications/mailerService");
 
 
 
@@ -229,6 +230,7 @@ exports.generalConfig = async (req, res) => {
 
 
 const EmailService = async()=>{
+  await Email.Init();
   await Notificaciones.deleteOld();
   await Notificaciones.deleteFrom("code",302);
   await Notificaciones.deleteFrom("code",303);
