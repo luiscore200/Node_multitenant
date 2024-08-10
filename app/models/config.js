@@ -43,8 +43,7 @@ class Config {
                                 app_logo VARCHAR(255) NULL,
                                    app_icon VARCHAR(255) NULL,
                                       app_name VARCHAR(255) NULL,
-                                         raffle_count VARCHAR(255) NULL,
-                                            raffle_number VARCHAR(255) NULL
+                                         app_suscriptions JSON
 
             )
 
