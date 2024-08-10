@@ -1,7 +1,7 @@
 exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
 
     const itemsPerPage=250;
-
+    
     const separados = asignaciones.filter(obj => obj.status==="separado").map(obj => obj.number);
     const pagados = asignaciones.filter(obj => obj.status==="pagado").map(obj => obj.number);
     //const totalNums=Number(raffle.numbers);
@@ -120,7 +120,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                     
                         try {
-                        const response = await fetch("http://206.189.233.111:3000/rifa/assignNumbers/"+raffleID, {
+                        const response = await fetch("https://app.megawins.com.co/rifa/assignNumbers/"+raffleID, {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                     
                         try {
-                        const response = await fetch("http://206.189.233.111:3000/comprador/store", {
+                        const response = await fetch("https://app.megawins.com.co/comprador/store", {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
