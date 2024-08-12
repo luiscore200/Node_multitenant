@@ -8,7 +8,7 @@ const createTables = async (nombreInquilino) => {
         name VARCHAR(100),
         email VARCHAR(100) UNIQUE,
         phone VARCHAR(15),
-        document VARCHAR(20) NOT NULL
+        document VARCHAR(20) NULL
       )
     `;
 
