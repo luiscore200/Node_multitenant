@@ -90,20 +90,16 @@ exports.store = async (req, res) => {
       if(typeof update.premios === "string"){
         try {
           const pr1 = JSON.parse(update.premios);
-          if(update.tipo==="anticipado"){
-            return pr1.map(obj => ({ ...obj })).reverse();
-          }else{
+        
             return pr1;
-          }
+          
         } catch (error) {
           
         }
       }else{
-        if(update.tipo==="anticipado"){
-          return update.premios.map(obj => ({ ...obj })).reverse();
-        }else{
+      
           return update.premios;
-        }
+        
 
       }
     }
@@ -156,7 +152,7 @@ exports.index = async (req, res) => {
             const totalAsignaciones = await Asignaciones.countByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio", item.id);
           
             const premios = item.prizes;
-            const premios2 = item.type == "anticipados" ? premios.map(obj => ({ ...obj })).reverse() : premios;
+         
             return {
                 id: item.id,
                 titulo: item.tittle,
@@ -165,7 +161,7 @@ exports.index = async (req, res) => {
                 numeros: item.numbers,
                 tipo: item.type,
                 imagen:  item.image ? baseUrl + item.image.replace('..','').replace('..\\', '').replace(/\\/g, '/') : '',
-                premios:premios2,
+                premios:premios,
                 asignaciones: totalAsignaciones,
             };
         }));
@@ -249,20 +245,16 @@ exports.update = async (req, res) => {
       if(typeof update.premios === "string"){
         try {
           const pr1 = JSON.parse(update.premios);
-          if(update.tipo==="anticipado"){
-            return pr1.map(obj => ({ ...obj })).reverse();
-          }else{
+         
             return pr1;
-          }
+          
         } catch (error) {
           
         }
       }else{
-        if(update.tipo==="anticipado"){
-          return update.premios.map(obj => ({ ...obj })).reverse();
-        }else{
+        
           return update.premios;
-        }
+        
 
       }
     }

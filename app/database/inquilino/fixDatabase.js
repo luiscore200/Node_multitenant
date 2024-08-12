@@ -62,7 +62,7 @@ const createTables = async (nombreInquilino) => {
 
     const configInsertQuery = `
     INSERT INTO ${nombreInquilino}.config (phone_verified, phone_status, email, password_email, email_status, email_verified, logo, bussines_name)
-    VALUES (false, false, NULL, NULL, false, false, NULL, NULL)
+    VALUES (false, false, "", "", false, false, "", "")
   `;
 
     const insert1 = `
@@ -73,7 +73,7 @@ const createTables = async (nombreInquilino) => {
 
     const insert2 = `
     INSERT INTO ${nombreInquilino}.raffle (tittle, price, country, image, numbers, type, prizes) VALUES 
-    ('Mi Primera Rifa', 100, 'Colombia', 'imagen.jpg', '1000', 'premio_unico', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]');
+    ('Mi Primera Rifa', 100, 'Colombia', 'imagen.jpg', '1000', 'oportunidades', '[{"id":1,"descripcion": "Primer Premio","loteria":"SINUANO NOCHE","ganador":"", "fecha": "2024-12-31"}]');
   `;
 
     const insert3 = `
@@ -97,9 +97,9 @@ const createTables = async (nombreInquilino) => {
     await connection.execute(notificacionQuery);
     await connection.execute(configQuery);
     await connection.execute(rifaQuery);
-    await connection.execute(insert1);
-    await connection.execute(insert2);
-    await connection.execute(insert3);
+   // await connection.execute(insert1);
+   // await connection.execute(insert2);
+   // await connection.execute(insert3);
     await connection.execute(configInsertQuery);
 
     // Verificar si el índice ya existe antes de crearlo
