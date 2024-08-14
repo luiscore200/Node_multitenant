@@ -185,7 +185,7 @@ const update = async(usuario,suscripcion)=>{
     try{
         console.log(suscripcion);
       
-        const update = await User.update(usuario.id,{payed:suscripcion.status,id_subscription:suscripcion.id});
+        const update = await User.update(usuario.id,{payed:suscripcion.payed,id_subscription:suscripcion.id});
     
         if(suscripcion.status===false ){
             const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false});
