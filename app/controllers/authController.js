@@ -45,10 +45,11 @@ exports.login = async (req, res) => {
 
             
              
-        if(status.payed===true||status.payed===false){
+        if(status){
+            console.log(status);
             const payed = usuario2.payed==0?false:true;
             if(status.payed!==payed || usuario2.id_subscription!==status.id){
-               // console.log("necesita actualizar");
+                console.log("necesita actualizar");
                 update(usuario2,status);
         
             }
@@ -182,9 +183,9 @@ exports.register = async (req, res) => {
 
 const update = async(usuario,suscripcion)=>{
     try{
-        console.log(suscripcion);
+      
         const update = await User.update(usuario.id,{payed:suscripcion.status,id_subscription:suscripcion.id});
-        console.log(update);
+    
         if(suscripcion.status===false ){
             const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false});
             notificar(dominio);
