@@ -155,7 +155,8 @@ exports.register = async (req, res) => {
             }
          const data = await response.json();
          console.log(data.results[0]);
-         console.log(data.result[0]["id"]?data.result[0]["id"]:"");
+         const subscriptionId = data.results[0]["id"] ? data.results[0]["id"] : "";
+         console.log(subscriptionId);
          if(!data.results[0]){
             return false;
          }else{
