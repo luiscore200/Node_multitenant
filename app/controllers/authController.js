@@ -46,7 +46,7 @@ exports.login = async (req, res) => {
             
              
         if(status){
-            console.log(status);
+            console.log("status",status);
             const payed = usuario2.payed==0?false:true;
             if(status.payed!==payed || usuario2.id_subscription!==status.id){
                 console.log("necesita actualizar");
