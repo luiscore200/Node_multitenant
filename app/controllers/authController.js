@@ -25,7 +25,7 @@ exports.login = async (req, res) => {
      
       
         const usuario2 = await User.find('email',email);
-        const status= await subs(email);
+       
        // return res.json(usuario);
         if (!usuario2) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
@@ -43,13 +43,13 @@ exports.login = async (req, res) => {
 
         if(usuario2.role ==="user"){
 
-            
+            const status= await subs(email);
              
         if(status){
-            console.log("status",status);
+          //  console.log("status",status);
             const payed = usuario2.payed==0?false:true;
             if(status.payed!==payed || usuario2.id_subscription!==status.id){
-                console.log("necesita actualizar");
+              //  console.log("necesita actualizar");
                 update(usuario2,status);
         
             }
