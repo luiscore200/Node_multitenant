@@ -183,6 +183,7 @@ exports.register = async (req, res) => {
 
 const update = async(usuario,suscripcion)=>{
     try{
+        console.log(suscripcion);
       
         const update = await User.update(usuario.id,{payed:suscripcion.status,id_subscription:suscripcion.id});
     
