@@ -189,9 +189,9 @@ const update = async(usuario,suscripcion)=>{
     
         if(suscripcion.status===false ){
             const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false});
-            notificar(dominio);
+            notificar(usuario.domain);
         }else{
-            await Notificaciones.deleteFrom(dominio,"code",310);
+            await Notificaciones.deleteFrom(usuario.domain,"code",310);
         }
 
     }catch(e){
