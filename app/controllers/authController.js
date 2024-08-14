@@ -74,7 +74,7 @@ exports.login = async (req, res) => {
 
         // Si las credenciales son correctas, generar un token JWT
         const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed };
-        const token = jwt.generateToken(payload, '1h');
+        const token = jwt.generateToken(payload, '24h');
         console.log("access_token: "+token);
 
         const mainDomain = process.env.MAIN_DOMAIN;
@@ -114,7 +114,7 @@ exports.register = async (req, res) => {
      const finded = await User.find('id',created.insertId);
 
       const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed };
-        const token = jwt.generateToken(payload, '1h');
+        const token = jwt.generateToken(payload, '24h');
         const mainDomain = process.env.MAIN_DOMAIN;
         const domain2 = `${finded.domain}.${mainDomain}`;
 
