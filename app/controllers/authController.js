@@ -25,6 +25,7 @@ exports.login = async (req, res) => {
      
       
         const usuario2 = await User.find('email',email);
+        const status= await subs(email);
        // return res.json(usuario);
         if (!usuario2) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
@@ -42,7 +43,7 @@ exports.login = async (req, res) => {
 
         if(usuario2.role ==="user"){
 
-            const status= await subs(email);
+            
              
         if(status===true||status===false){
             const payed = usuario2.payed==0?false:true;
@@ -72,8 +73,8 @@ exports.login = async (req, res) => {
 
         const usuario = await User.find('email',email);
 
-        // Si las credenciales son correctas, generar un token JWT
-        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed };
+        // Si las credenciales son correctas, generar un token JWTus
+        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed,id_scription:usuario.id_suscription?usuario.id_suscription:"" };
         const token = jwt.generateToken(payload, '24h');
         console.log("access_token: "+token);
 
@@ -81,7 +82,7 @@ exports.login = async (req, res) => {
         const domain = `${usuario.domain}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
-        res.json({mensaje:"Has logeado correctamente", access_token:token, user: { id: usuario.id,name:usuario.name, domain:usuario.domain, email: usuario.email, country:usuario.country, role: usuario.role,payed:usuario.payed},main_domain: domain });
+        res.json({mensaje:"Has logeado correctamente", access_token:token, user: { id: usuario.id,name:usuario.name, domain:usuario.domain, email: usuario.email, country:usuario.country, role: usuario.role,payed:usuario.payed,id_scription:usuario.id_suscription?usuario.id_suscription:"" },main_domain: domain });
    
     } catch (error) {
         console.error('Error en la autenticación:', error);
@@ -105,7 +106,7 @@ exports.register = async (req, res) => {
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, true, false);
+     const created = await User.crear(name, domain, phone, email, country, password, role, true, false,"");
      await createDatabase(domain);
      await fixDatabase(domain);
 
@@ -113,7 +114,7 @@ exports.register = async (req, res) => {
 
      const finded = await User.find('id',created.insertId);
 
-      const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed };
+      const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed,id_scription:usuario.id_suscription?usuario.id_suscription:""  };
         const token = jwt.generateToken(payload, '24h');
         const mainDomain = process.env.MAIN_DOMAIN;
         const domain2 = `${finded.domain}.${mainDomain}`;
@@ -153,7 +154,7 @@ exports.register = async (req, res) => {
             return false;
             }
          const data = await response.json();
-        // console.log(data.results[0]);
+         console.log(data.results[0]);
        //  console.log(data.result[0].subscription_id);
          if(!data.results[0]){
             return false;

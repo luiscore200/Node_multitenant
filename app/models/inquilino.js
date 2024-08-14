@@ -28,11 +28,12 @@ class User {
   }
 
 
-  static async crear(name,domain, phone, email , country, password, role,  status, payed) {
+  static async crear(name,domain, phone, email , country, password, role,  status, payed,suscripcion) {
     let localStatus;
     let localRole;
     let localPassword;
     let localPayed;
+    let localSuscripcion;
     try {
       if(role && role=="admin"||role=="user"){
         localRole=role;
@@ -56,10 +57,15 @@ class User {
       }else{
         localPayed = true;
       }
+      if(!suscripcion){
+        localSuscripcion="";
+      }else{
+        localSuscripcion=suscripcion;
+      }
 
       const hashedPassword = await hashPassword(localPassword);
-      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
-         [name, domain, phone, email, country, hashedPassword, localStatus, "user", localPayed]);
+      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed,id_suscription) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)',
+         [name, domain, phone, email, country, hashedPassword, localStatus, "user", localPayed,localSuscripcion]);
       return results;
     } catch (error) {
       throw error;

@@ -49,7 +49,7 @@
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
     }
     
-    const { name, phone, email, password, role, status,domain, country,payed } = req.body;
+    const { name, phone, email, password, role, status,domain, country,payed,suscription } = req.body;
       
     try {
       await User.crearTabla();
@@ -57,7 +57,7 @@
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed);
+     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed, suscription? suscription:"");
      await createDatabase(domain);
      await fixDatabase(domain);
 
@@ -77,6 +77,7 @@
         pais: finded.country,
         role: finded.role,
         payed: finded.payed,
+        id_scription:finded.id_suscription?finded.id_suscription:"" 
         // Puedes incluir más campos del inquilino aquí si los deseas
       },
 //      dominio: `${nombre}.${main}`, // Reemplaza tudominio.com con tu dominio real
