@@ -7,7 +7,7 @@
   const {validateCreateUser,validateUpdateUser} = require('../validators/userValidator.js');
   require('dotenv').config();
 
-  const validFields = ['name','domain', 'phone', 'email', 'country','password', 'status', 'role', 'payed'];
+  const validFields = ['name','domain', 'phone', 'email', 'country','password', 'status', 'role', 'payed','subscription_id'];
   
   exports.indexUser = async (req, res) => {
 
@@ -49,7 +49,7 @@
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
     }
     
-    const { name, phone, email, password, role, status,domain, country,payed,suscription } = req.body;
+    const { name, phone, email, password, role, status,domain, country,payed,id_subscription } = req.body;
       
     try {
       await User.crearTabla();
@@ -57,7 +57,7 @@
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed, suscription? suscription:"");
+     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed, id_subscription? id_subscription:"");
      await createDatabase(domain);
      await fixDatabase(domain);
 
@@ -77,7 +77,7 @@
         pais: finded.country,
         role: finded.role,
         payed: finded.payed,
-        id_scription:finded.id_suscription?finded.id_suscription:"" 
+        id_subscription:finded.id_subscription?finded.id_subscription:"" 
         // Puedes incluir más campos del inquilino aquí si los deseas
       },
 //      dominio: `${nombre}.${main}`, // Reemplaza tudominio.com con tu dominio real

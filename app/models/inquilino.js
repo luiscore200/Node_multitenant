@@ -17,7 +17,8 @@ class User {
           password VARCHAR(255) NOT NULL,
           status BOOLEAN NOT NULL  DEFAULT '0',
           role VARCHAR(255) NOT NULL  DEFAULT 'user' CHECK (role IN ('user', 'admin')), 
-          payed BOOLEAN NOT NULL DEFAULT '0'
+          payed BOOLEAN NOT NULL DEFAULT '0',
+          id_subscription VARCHAR(255) DEFAULT "";
         )
       `);
       console.log('Tabla  users creada o ya existente');

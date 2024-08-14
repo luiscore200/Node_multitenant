@@ -45,9 +45,9 @@ exports.login = async (req, res) => {
 
             
              
-        if(status===true||status===false){
+        if(status.payed===true||status.payed===false){
             const payed = usuario2.payed==0?false:true;
-            if(status!==payed){
+            if(status.payed!==payed || usuario2.id_subscription!==status.id){
                // console.log("necesita actualizar");
                 update(usuario2,status);
         
@@ -74,7 +74,7 @@ exports.login = async (req, res) => {
         const usuario = await User.find('email',email);
 
         // Si las credenciales son correctas, generar un token JWTus
-        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed,id_scription:usuario.id_suscription?usuario.id_suscription:"" };
+        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed,id_subscription:usuario.id_suscription };
         const token = jwt.generateToken(payload, '24h');
         console.log("access_token: "+token);
 
@@ -82,7 +82,7 @@ exports.login = async (req, res) => {
         const domain = `${usuario.domain}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
-        res.json({mensaje:"Has logeado correctamente", access_token:token, user: { id: usuario.id,name:usuario.name, domain:usuario.domain, email: usuario.email, country:usuario.country, role: usuario.role,payed:usuario.payed,id_scription:usuario.id_suscription?usuario.id_suscription:"" },main_domain: domain });
+        res.json({mensaje:"Has logeado correctamente", access_token:token, user: { id: usuario.id,name:usuario.name, domain:usuario.domain, email: usuario.email, country:usuario.country, role: usuario.role,payed:usuario.payed,id_subscription:usuario.id_subscription },main_domain: domain });
    
     } catch (error) {
         console.error('Error en la autenticación:', error);
@@ -114,7 +114,7 @@ exports.register = async (req, res) => {
 
      const finded = await User.find('id',created.insertId);
 
-      const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed,id_scription:usuario.id_suscription?usuario.id_suscription:""  };
+      const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed,id_subscription:finded.id_subscription  };
         const token = jwt.generateToken(payload, '24h');
         const mainDomain = process.env.MAIN_DOMAIN;
         const domain2 = `${finded.domain}.${mainDomain}`;
@@ -154,18 +154,20 @@ exports.register = async (req, res) => {
             return false;
             }
          const data = await response.json();
-         console.log(data.results[0]);
+       //  console.log(data.results[0]);
          const subscriptionId = data.results[0]["subscription_id"] ? data.results[0]["subscription_id"] : "";
-         console.log(subscriptionId);
+       // console.log(subscriptionId);
          if(!data.results[0]){
-            return false;
+            return {payed:false,id:""};
          }else{
             if(data.results[0].status==="authorized"){
-                return true;
+                return {payed:true,id:subscriptionId};
             }else if(data.results[0].status==="paused"){
-                return false;
+                return {payed:false,id:subscriptionId};
+            }else if(data.results[0].status==="cancelled"){
+                return {payed:false,id:subscriptionId};
             }else{
-                return false;
+                return  {payed:false,id:""};
             }
          }
          
@@ -174,14 +176,14 @@ exports.register = async (req, res) => {
         await adminNotificaciones.deleteOld();
         await adminNotificaciones.store({description:"un usuario ha intentado verificar su suscripcion y el api de mercado pago ha fallado",type:"sistema",code:9999});
         console.error("Error en authController, subs:", error);
-        return false;
+        return {payed:false,id:""};
      }
   }
 
-const update = async(usuario,boolean)=>{
+const update = async(usuario,suscripcion)=>{
     try{
-        const update = await User.update(usuario.id,{payed:boolean});
-        if(boolean===false ){
+        const update = await User.update(usuario.id,{payed:suscripcion.status,id_subscription:suscripcion.id});
+        if(suscripcion.status===false ){
             const update2 = await Config.update(usuario.domain,{phone_status:false,email_status:false});
             notificar(dominio);
         }else{
