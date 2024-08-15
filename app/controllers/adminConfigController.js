@@ -8,11 +8,19 @@ const Notificaciones = require('../models/notificaciones');
 const Email = require("../notifications/mailerService");
 const Suscripciones = require("../models/suscripciones");
 
+const getDestinationPath = (fieldname) => {
+  const adminFields = ['banner_1', 'banner_2', 'banner_3', 'app_logo', 'app_icon'];
+  return adminFields.includes(fieldname)
+      ? path.join(__dirname, "../src/images/admin/config")
+      : path.join(__dirname, "../src/images/admin/subs");
+};
 
 
 //multer Config
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+      console.log(file.fieldname);
+      console.log(file.filename);
       cb(null, path.join(__dirname, "../src/images/admin/config")); // Cambia 'uploads' por la carpeta deseada
     },
     filename: function (req, file, cb) {
@@ -90,35 +98,39 @@ if(atributosCambiados.find(obj => obj==="email")||atributosCambiados.find(obj =>
   EmailService();
 }
 
-if(atributosCambiados.find(obj => obj==="raffle_count")){
-  const updated = await Config.update({"raffle_count":update.raffle_count});
-}
 
-if(atributosCambiados.find(obj => obj==="raffle_number")){
-  const updated = await Config.update({"raffle_number":update.raffle_number});
-}
 if(atributosCambiados.find(obj => obj==="app_name")){
   const updated = await Config.update({"app_name":update.app_name});
 }
 if(atributosCambiados.find(obj => obj==="banner_1")){
-  deleteImage(conf.banner_1);
-  const updated = await Config.update({"banner_1":update.banner_1});
+  if(update.banner_1===""){
+    await deleteImage(path.join(__dirname, conf.banner_1));
+    const updated = await Config.update({"banner_1":update.banner_1});
+  }
 }
 if(atributosCambiados.find(obj => obj==="banner_2")){
-  deleteImage(conf.banner_2);
-  const updated = await Config.update({"banner_2":update.banner_2});
+    if(update.banner_2===""){
+    await deleteImage(path.join(__dirname, conf.banner_2));
+    const updated = await Config.update({"banner_2":update.banner_2});
+  }
 }
 if(atributosCambiados.find(obj => obj==="banner_3")){
-  deleteImage(conf.banner_3);
-  const updated = await Config.update({"banner_3":update.banner_3});
+  if(update.banner_3===""){
+    await deleteImage(path.join(__dirname, conf.banner_3));
+    const updated = await Config.update({"banner_3":update.banner_3});
+  }
 }
 if(atributosCambiados.find(obj => obj==="app_logo")){
-  deleteImage(conf.app_logo);
-  const updated = await Config.update({"app_logo":update.app_logo});
+  if(update.app_logo===""){
+    await deleteImage(path.join(__dirname, conf.app_logo));
+    const updated = await Config.update({"app_logo":update.app_logo});
+  }
 }
 if(atributosCambiados.find(obj => obj==="app_icon")){
-  deleteImage(conf.app_icon);
-  const updated = await Config.update({"app_icon":update.app_icon});
+  if(update.app_icon===""){
+    await deleteImage(path.join(__dirname, conf.app_icon));
+    const updated = await Config.update({"app_icon":update.app_icon});
+  }
 }
 
 

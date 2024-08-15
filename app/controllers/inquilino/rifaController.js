@@ -183,7 +183,9 @@ exports.delete  = async(req,res)=>{
    try{
     const aa= await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
     if(!aa){  return res.json({error:"objeto no encontrado"});}
-    await deleteImage(path.join(__dirname, aa.image));
+    if(aa.image!==""){
+      await deleteImage(path.join(__dirname, aa.image));
+    }
     const dd = Rifa.eliminar(decodedToken? decodedToken.dominio:"numero1Dominio",id);
     return res.json({mensaje:"Rifa eliminada con exito"});
    
@@ -284,8 +286,6 @@ exports.update = async (req, res) => {
   } 
 
   if(update.imagen==="" && rifa.image!==""){
-    const deletePath = path.join(__dirname, rifa.image);
-    console.log("delete",deletePath);
     await deleteImage(path.join(__dirname, rifa.image));
    // updates.image = "";
   }
