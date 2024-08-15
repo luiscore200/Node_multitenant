@@ -215,9 +215,9 @@ exports.index = async (req, res) => {
     const config = await Config.index(); // Supongo que Config.index() devuelve el objeto de configuración
     const sus = await Suscripciones.index();
     const processedConfig = processConfigForClient(config,true);
-    processedConfig.app_subscriptions=sus;
+    
 
-    return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig});
+    return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig,subscriptions:sus});
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error al obtener la configuración.' });
