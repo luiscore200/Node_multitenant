@@ -6,6 +6,7 @@ const Config = require('../models/config');
 require('dotenv').config();
 const Notificaciones = require('../models/notificaciones');
 const Email = require("../notifications/mailerService");
+const Suscripciones = require("../models/suscripciones");
 
 
 
@@ -88,6 +89,7 @@ if(atributosCambiados.find(obj => obj==="email")||atributosCambiados.find(obj =>
 if(atributosCambiados.find(obj => obj==="raffle_count")){
   const updated = await Config.update({"raffle_count":update.raffle_count});
 }
+
 if(atributosCambiados.find(obj => obj==="raffle_number")){
   const updated = await Config.update({"raffle_number":update.raffle_number});
 }
@@ -115,6 +117,13 @@ if(atributosCambiados.find(obj => obj==="app_icon")){
   const updated = await Config.update({"app_icon":update.app_icon});
 }
 
+
+
+
+
+if(atributosCambiados.find(obj => obj==="app_subscriptions")){
+  const updated = await Config.update({"app_subscriptions":update.app_subscriptions});
+}
    
   
    
@@ -204,8 +213,9 @@ exports.index = async (req, res) => {
   //if(decodedToken.role!=="admin"){return res.status(400).json({error:"No autorizado"});'
   try {
     const config = await Config.index(); // Supongo que Config.index() devuelve el objeto de configuración
-    
+    const sus = await Suscripciones.index();
     const processedConfig = processConfigForClient(config,true);
+    processedConfig.app_subscriptions=sus;
 
     return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig});
   } catch (error) {
