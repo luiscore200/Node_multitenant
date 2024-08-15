@@ -10,21 +10,13 @@ const Suscripciones = require("../models/suscripciones");
 
 
 
-const getDestinationPath = (fieldname) => {
-  const adminFields = ['banner_1', 'banner_2', 'banner_3', 'app_logo', 'app_icon'];
-  return adminFields.includes(fieldname)
-      ? path.join(__dirname, "../src/images/admin/config")
-      : path.join(__dirname, "../src/images/admin/subsImage");
-};
-
-
 //multer Config
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, getDestinationPath(file.fieldname)); // Cambia 'uploads' por la carpeta deseada
+      cb(null, path.join(__dirname, "../src/images/admin/config")); // Cambia 'uploads' por la carpeta deseada
     },
     filename: function (req, file, cb) {
-      //  console.log(file);
+        console.log(file);
       cb(null, Date.now()+"_"+file.originalname); // Guarda el archivo con su nombre original
     }
   });
@@ -35,8 +27,7 @@ const storage = multer.diskStorage({
     { name: 'banner_2', maxCount: 1 },
     { name: 'banner_3', maxCount: 1 },
     { name: 'app_logo', maxCount: 1 },
-    { name: 'app_icon', maxCount: 1 },
-    { name: 'image',    maxCount:10 }]);
+    { name: 'app_icon', maxCount: 1 }]);
 
 
     const deleteImage = async (imagePath) => {
@@ -177,15 +168,6 @@ if(atributosCambiados.find(obj => obj==="app_subscriptions")){
         await deleteImage(path.join(__dirname, conf.app_icon));
         await Config.update({ "app_icon": relativeApp_iconPath });
       }
-
-      if (req.files.image) {
-        const Path = req.files.image[0].path;
-        const relativePath = path.relative(__dirname, Path);
-        console.log("path",Path);
-        console.log("relative",relativePath);
-
-      }
-
     }
 
 
