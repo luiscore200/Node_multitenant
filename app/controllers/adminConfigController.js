@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
       cb(null, getDestinationPath(file.fieldname)); // Cambia 'uploads' por la carpeta deseada
     },
     filename: function (req, file, cb) {
-        console.log(file);
+      //  console.log(file);
       cb(null, Date.now()+"_"+file.originalname); // Guarda el archivo con su nombre original
     }
   });
@@ -177,6 +177,15 @@ if(atributosCambiados.find(obj => obj==="app_subscriptions")){
         await deleteImage(path.join(__dirname, conf.app_icon));
         await Config.update({ "app_icon": relativeApp_iconPath });
       }
+
+      if (req.files.image) {
+        const Path = req.files.image[0].path;
+        const relativePath = path.relative(__dirname, Path);
+        console.log("path",Path);
+        console.log("relative",relativePath);
+
+      }
+
     }
 
 
