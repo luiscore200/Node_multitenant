@@ -19,9 +19,8 @@ const getDestinationPath = (fieldname) => {
 //multer Config
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      console.log(file.fieldname);
-      console.log(file.filename);
-      cb(null, path.join(__dirname, "../src/images/admin/config")); // Cambia 'uploads' por la carpeta deseada
+   
+      cb(null, path.join(getDestinationPath(file.fieldname))); // Cambia 'uploads' por la carpeta deseada
     },
     filename: function (req, file, cb) {
         console.log(file);
