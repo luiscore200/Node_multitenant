@@ -206,7 +206,7 @@ exports.update = async (req, res) => {
         precio: 'price',
         pais: 'country',
         numeros: 'numbers',
-      ///  imagen:'image',
+        imagen:'image',
         tipo: 'type',
         premios: 'prizes'
     };
