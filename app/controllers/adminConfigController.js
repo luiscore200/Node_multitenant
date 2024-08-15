@@ -10,10 +10,18 @@ const Suscripciones = require("../models/suscripciones");
 
 
 
+const getDestinationPath = (fieldname) => {
+  const adminFields = ['banner_1', 'banner_2', 'banner_3', 'app_logo', 'app_icon'];
+  return adminFields.includes(fieldname)
+      ? path.join(__dirname, "../src/images/admin/config")
+      : path.join(__dirname, "../src/images/admin/subsImage");
+};
+
+
 //multer Config
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, path.join(__dirname, "../src/images/admin/config")); // Cambia 'uploads' por la carpeta deseada
+      cb(null, getDestinationPath(file.fieldname)); // Cambia 'uploads' por la carpeta deseada
     },
     filename: function (req, file, cb) {
         console.log(file);
@@ -22,8 +30,13 @@ const storage = multer.diskStorage({
   });
   const upload = multer({ storage: storage });
   //multer middleware
-  exports.uploadImages = upload.fields([{ name: 'banner_1', maxCount: 1 },
-    { name: 'banner_2', maxCount: 1 },{ name: 'banner_3', maxCount: 1 },{ name: 'app_logo', maxCount: 1 },{ name: 'app_icon', maxCount: 1 }]);
+  exports.uploadImages = upload.fields([
+    { name: 'banner_1', maxCount: 1 },
+    { name: 'banner_2', maxCount: 1 },
+    { name: 'banner_3', maxCount: 1 },
+    { name: 'app_logo', maxCount: 1 },
+    { name: 'app_icon', maxCount: 1 },
+    { name: 'image',    maxCount:10 }]);
 
 
     const deleteImage = async (imagePath) => {
