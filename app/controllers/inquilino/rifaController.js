@@ -206,7 +206,7 @@ exports.update = async (req, res) => {
         precio: 'price',
         pais: 'country',
         numeros: 'numbers',
-        imagen:'image',
+      ///  imagen:'image',
         tipo: 'type',
         premios: 'prizes'
     };
@@ -278,7 +278,7 @@ exports.update = async (req, res) => {
     if (req.files.imagen) {
       const imagenPath = req.files.imagen[0].path;
       const relativeImagenPath = path.relative(__dirname, imagenPath);
-      await deleteImage(path.join(__dirname, rifa.image));
+     if(rifa.image!==""){ await deleteImage(path.join(__dirname, rifa.image));}
       updates.image = relativeImagenPath;
     }
   } 
