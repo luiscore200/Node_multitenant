@@ -148,35 +148,35 @@ if(atributosCambiados.find(obj => obj==="app_subscriptions")){
         const banner1Path = req.files.banner_1[0].path;
         const relativeBanner1Path = path.relative(__dirname, banner1Path);
         images.banner_1 = relativeBanner1Path;
-        await deleteImage(path.join(__dirname, conf.banner_1));
+        if(conf.banner_1!==""){await deleteImage(path.join(__dirname, conf.banner_1));}
         await Config.update({ "banner_1": relativeBanner1Path });
       }
       if (req.files.banner_2) {
         const banner2Path = req.files.banner_2[0].path;
         const relativeBanner2Path = path.relative(__dirname, banner2Path);
         images.banner_2 = relativeBanner2Path;
-        await deleteImage(path.join(__dirname, conf.banner_2));
+        if(conf.banner_2!==""){await deleteImage(path.join(__dirname, conf.banner_2));}
         await Config.update({ "banner_2": relativeBanner2Path });
       }
       if (req.files.banner_3) {
         const banner3Path = req.files.banner_3[0].path;
         const relativeBanner3Path = path.relative(__dirname, banner3Path);
         images.banner_3 = relativeBanner3Path;
-        await deleteImage(path.join(__dirname, conf.banner_3));
+        if(conf.banner_3!==""){await deleteImage(path.join(__dirname, conf.banner_3));}
         await Config.update({ "banner_3": relativeBanner3Path });
       }
       if (req.files.app_logo) {
         const app_logoPath = req.files.app_logo[0].path;
         const relativeApp_logoPath = path.relative(__dirname, app_logoPath);
         images.app_logo = relativeApp_logoPath;
-        await deleteImage(path.join(__dirname, conf.app_logo));
+        if(conf.app_logo!==""){await deleteImage(path.join(__dirname, conf.app_logo));}
         await Config.update({ "app_logo": relativeApp_logoPath });
       }
       if (req.files.app_icon) {
         const app_iconPath = req.files.app_icon[0].path;
         const relativeApp_iconPath = path.relative(__dirname, app_iconPath);
         images.app_icon = relativeApp_iconPath;
-        await deleteImage(path.join(__dirname, conf.app_icon));
+        if(conf.app_icon!==""){await deleteImage(path.join(__dirname, conf.app_icon));}
         await Config.update({ "app_icon": relativeApp_iconPath });
       }
     }
