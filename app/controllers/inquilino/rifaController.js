@@ -235,6 +235,7 @@ exports.update = async (req, res) => {
     
 
      const rifa = await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
+     console.log("rifa",rifa);
      if(!rifa){
       return res.json({error:"objeto a actualizar no existe"});
      }
@@ -262,7 +263,7 @@ exports.update = async (req, res) => {
 
 
     const premios2 = await pr(update);
-    console.log(premios2);
+   // console.log(premios2);
 
 
   // Crear objeto de actualizaciones con los nombres de campos en inglés
@@ -282,9 +283,9 @@ exports.update = async (req, res) => {
     }
   } 
 
-  if(update.imagen && update.imagen==="" && rifa.image!==""){
+  if(update.imagen==="" && rifa.image!==""){
     const deletePath = path.join(__dirname, rifa.image);
-    console.log(deletePath);
+    console.log("delete",deletePath);
    // await deleteImage(path.join(__dirname, rifa.image));
    // updates.image = "";
   }
