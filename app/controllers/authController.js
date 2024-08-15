@@ -156,11 +156,12 @@ exports.register = async (req, res) => {
             }
          const data = await response.json();
        //  console.log(data.results[0]);
-         const subscriptionId = data.results[0]["subscription_id"] ? data.results[0]["subscription_id"] : "";
+        
        // console.log(subscriptionId);
          if(!data.results[0]){
             return {payed:false,id:""};
          }else{
+            const subscriptionId = data.results[0]["subscription_id"];
             if(data.results[0].status==="authorized"){
                 return {payed:true,id:subscriptionId};
             }else if(data.results[0].status==="paused"){

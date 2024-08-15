@@ -283,7 +283,7 @@ exports.update = async (req, res) => {
   } 
 
   if(update.imagen && update.imagen===""){
-    await deleteImage(rifa.image);
+    await deleteImage(path.join(__dirname, rifa.image));
     updates.image = "";
   }
 
