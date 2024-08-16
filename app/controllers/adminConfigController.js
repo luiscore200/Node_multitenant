@@ -134,11 +134,34 @@ if(atributosCambiados.find(obj => obj==="app_icon")){
 }
 
 
+function findPath(name) {
+  if (!req.files || !req.files.image || !req.files.image.length || name==="") {
+    return "";
+  }
 
+  for (const file of req.files.image) {
+    if (file.originalname === name) {
+      return path.relative(__dirname, file.path);
+    }
+  }
 
+  return "";
+}
 
 if(update['subscriptions']){
-  console.log(update['subscriptions'])
+
+  const suscripciones = update['subscriptions'];
+  if(suscripciones.length>0){
+    suscripciones.forEach((subscription) => {
+      const imagePath = findPath(subscription.image);
+      if (imagePath) { 
+        subscription.image = imagePath;
+      }
+    });
+
+  }
+
+  console.log(update['subscriptions']);
 }
    
   
