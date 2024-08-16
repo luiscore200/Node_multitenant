@@ -34,7 +34,8 @@ const storage = multer.diskStorage({
     { name: 'banner_2', maxCount: 1 },
     { name: 'banner_3', maxCount: 1 },
     { name: 'app_logo', maxCount: 1 },
-    { name: 'app_icon', maxCount: 1 }]);
+    { name: 'app_icon', maxCount: 1 },
+    { name: 'image',  maxCount:   10}]);
 
 
     const deleteImage = async (imagePath) => {
@@ -136,8 +137,8 @@ if(atributosCambiados.find(obj => obj==="app_icon")){
 
 
 
-if(atributosCambiados.find(obj => obj==="app_subscriptions")){
-  const updated = await Config.update({"app_subscriptions":update.app_subscriptions});
+if(update['subscriptions']){
+  console.log(update['subscriptions'])
 }
    
   
@@ -182,8 +183,8 @@ if(atributosCambiados.find(obj => obj==="app_subscriptions")){
     }
 
 
-    const aa= await Config.index();
-    console.log(aa);
+    //const aa= await Config.index();
+   // console.log(aa);
    // console.log('Banners:', images);
     
     return res.json({ mensaje: 'Configuración guardada correctamente.', images });
