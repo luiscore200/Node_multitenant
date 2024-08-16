@@ -150,7 +150,7 @@ function findPath(name) {
 
 if(update['subscriptions']){
 
-  const suscripciones = update['subscriptions'];
+  const suscripciones = JSON.parse(update['subscriptions']);
   if(suscripciones.length>0){
     suscripciones.forEach((subscription) => {
       const imagePath = findPath(subscription.image);
