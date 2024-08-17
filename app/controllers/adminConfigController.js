@@ -7,6 +7,7 @@ require('dotenv').config();
 const Notificaciones = require('../models/notificaciones');
 const Email = require("../notifications/mailerService");
 const Suscripciones = require("../models/suscripciones");
+const Subscriptions = require('../models/suscripciones');
 
 const getDestinationPath = (fieldname) => {
   const adminFields = ['banner_1', 'banner_2', 'banner_3', 'app_logo', 'app_icon'];
@@ -54,6 +55,18 @@ const storage = multer.diskStorage({
         }
       }
     };
+
+    const deleteAllReqFiles = async (req) => {
+      if (req.files) {
+          for (const key in req.files) {
+              const filesArray = req.files[key];
+              for (const file of filesArray) {
+                  await deleteImage(file.path);
+              }
+          }
+      }
+  };
+    
     
 
 exports.saveConfig = async(req,res)=>{
@@ -64,23 +77,21 @@ exports.saveConfig = async(req,res)=>{
     
     const images = {};
     
-    //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
-    //if(decodedToken.role!=="admin"){return res.status(400).json({error:"No autorizado"})}
+    if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+    if(decodedToken.role!=="admin"){return res.status(400).json({error:"No autorizado"})}
     
     
   try {
     
-    console.log(update);
+   // console.log(update);
     await Config.create();
     const conf=  await Config.index();
 
     
     const atributosCambiados = [];
+    const updateKeys = Object.keys(update);
 
-
-       const updateKeys = Object.keys(update);
-
-    // Iterar sobre las claves de update
+   
     updateKeys.forEach(clave => {
       if (conf.hasOwnProperty(clave) && conf[clave] !== update[clave]) {
         atributosCambiados.push(clave);
@@ -88,9 +99,10 @@ exports.saveConfig = async(req,res)=>{
     });
 //    console.log("atributos",atributosCambiados);
 
-    if(atributosCambiados.find(obj => obj==="email")){
-      const updated = await Config.update({"email":req.body.email});
-  }
+
+  if(atributosCambiados.find(obj => obj==="email")){
+    const updated = await Config.update({"email":req.body.email});
+}
   if(atributosCambiados.find(obj => obj==="email_password")){
     const updated = await Config.update({"email_password":update.email_password});
 }
@@ -104,31 +116,31 @@ if(atributosCambiados.find(obj => obj==="app_name")){
 }
 if(atributosCambiados.find(obj => obj==="banner_1")){
   if(update.banner_1===""){
-    await deleteImage(path.join(__dirname, conf.banner_1));
+    if(conf.banner_1!==""){await deleteImage(path.join(__dirname, conf.banner_1));}
     const updated = await Config.update({"banner_1":update.banner_1});
   }
 }
 if(atributosCambiados.find(obj => obj==="banner_2")){
     if(update.banner_2===""){
-    await deleteImage(path.join(__dirname, conf.banner_2));
+      if(conf.banner_2!==""){await deleteImage(path.join(__dirname, conf.banner_2));}
     const updated = await Config.update({"banner_2":update.banner_2});
   }
 }
 if(atributosCambiados.find(obj => obj==="banner_3")){
   if(update.banner_3===""){
-    await deleteImage(path.join(__dirname, conf.banner_3));
+    if(conf.banner_3!==""){await deleteImage(path.join(__dirname, conf.banner_3));}
     const updated = await Config.update({"banner_3":update.banner_3});
   }
 }
 if(atributosCambiados.find(obj => obj==="app_logo")){
   if(update.app_logo===""){
-    await deleteImage(path.join(__dirname, conf.app_logo));
+    if(conf.app_logo!==""){await deleteImage(path.join(__dirname, conf.app_logo));}
     const updated = await Config.update({"app_logo":update.app_logo});
   }
 }
 if(atributosCambiados.find(obj => obj==="app_icon")){
   if(update.app_icon===""){
-    await deleteImage(path.join(__dirname, conf.app_icon));
+    if(conf.app_icon!==""){await deleteImage(path.join(__dirname, conf.app_icon));}
     const updated = await Config.update({"app_icon":update.app_icon});
   }
 }
@@ -138,10 +150,10 @@ function findPath(name) {
   if (!req.files || !req.files.image || !req.files.image.length || name==="") {
     return "";
   }
-
   for (const file of req.files.image) {
-    if (file.originalname === name) {
-      return path.relative(__dirname, file.path);
+    if (file.originalname === name) {   
+     
+        return path.relative(__dirname, file.path);
     }
   }
 
@@ -150,6 +162,7 @@ function findPath(name) {
 
 if(update['subscriptions']){
 
+ try {
   const suscripciones = JSON.parse(update['subscriptions']);
   if(suscripciones.length>0){
     suscripciones.forEach((subscription) => {
@@ -160,8 +173,14 @@ if(update['subscriptions']){
     });
 
   }
+    await updateSubs(suscripciones);
+ // console.log(suscripciones);
 
-  console.log(suscripciones);
+ } catch (error) {
+     deleteAllReqFiles(req);
+     return res.json({error:"Formato de suscripcion no valido"});
+ }
+
 }
    
   
@@ -284,3 +303,53 @@ const EmailService = async()=>{
   await Notificaciones.deleteFrom("code",302);
   await Notificaciones.deleteFrom("code",303);
 }
+
+
+const updateSubs = async (array) => {
+  console.log(array);
+
+  try {
+    
+    
+    const currentSubs = await Suscripciones.index();
+    const receivedIds = new Set(array.map(obj => obj.id));
+
+    for (const sub of currentSubs) {
+      if (!receivedIds.has(sub.id)) {
+        await Suscripciones.delete("id",sub.id);
+      }
+    }
+  
+  
+  for (const obj of array) {
+    if (!obj.id) {
+      await Suscripciones.store(
+        obj.name,
+        obj.sub_id,
+        obj.url,
+        obj.image,
+        obj.max_raffle,
+        obj.max_num,
+        obj.whatsapp,
+        obj.banners,
+        obj.email
+      );
+    } else {
+      
+      await Suscripciones.update(obj.id, {
+        name: obj.name,
+        subs_id: obj.subs_id,
+        url: obj.url,
+        image: obj.image,
+        max_raffle: obj.max_raffle,
+        max_num: obj.max_num,
+        whatsapp: obj.whatsapp,
+        banners: obj.banners,
+        email: obj.email
+      });
+    }
+  }
+  } catch (error) {
+    throw new  Error;
+  }
+};

@@ -53,6 +53,27 @@ class Subscriptions {
         }
     }
 
+    static async update(id, updates) {
+        try {
+            const fields = [];
+            const values = [];
+
+            for (const [key, value] of Object.entries(updates)) {
+                fields.push(`${key} = ?`);
+                values.push(value);
+            }
+
+            values.push(id);
+
+            const sql = `UPDATE subscriptions SET ${fields.join(', ')} WHERE id = ?`;
+
+            const [results] = await connection.execute(sql, values);
+            return results;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // Método para eliminar todas las suscripciones
     static async deleteAll() {
         try {
