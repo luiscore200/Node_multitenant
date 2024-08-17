@@ -5,17 +5,18 @@ class Subscriptions {
     static async insert() {
         try {
             const query = `
-               CREATE TABLE subscriptions (
-                    id VARCHAR(255) PRIMARY KEY,
-                    name VARCHAR(255) DEFAULT "",
-                    url VARCHAR(255) DEFAULT "",
-                    image VARCHAR(255) DEFAULT "",
-                    max_raffle INT DEFAULT 1000,
-                    max_num INT DEFAULT 10000,
-                    whatsapp BOOLEAN DEFAULT false,
-                    banners BOOLEAN DEFAULT false,
-                    email BOOLEAN DEFAULT false
-                );
+            CREATE TABLE IF NOT EXISTS subscriptions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) DEFAULT "",
+                url VARCHAR(255) DEFAULT "",
+                image VARCHAR(255) DEFAULT "",
+                max_raffle INT DEFAULT 1000,
+                max_num INT DEFAULT 10000,
+                whatsapp BOOLEAN DEFAULT false,
+                banners BOOLEAN DEFAULT false,
+                email BOOLEAN DEFAULT false
+            );
+
 
             `;
             const [results] = await connection.execute(query);

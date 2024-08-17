@@ -323,6 +323,7 @@ const updateSubs = async (array) => {
   
   for (const obj of array) {
     if (!obj.id) {
+      await Suscripciones.insert();
       await Suscripciones.store(
         obj.name,
         obj.sub_id,
