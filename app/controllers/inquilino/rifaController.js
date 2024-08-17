@@ -64,6 +64,18 @@ exports.uploadImages = upload.fields([{ name: 'imagen', maxCount: 1 }]);
       }
     }
   };
+
+  
+  const deleteAllReqFiles = async (req) => {
+    if (req.files) {
+        for (const key in req.files) {
+            const filesArray = req.files[key];
+            for (const file of filesArray) {
+                await deleteImage(file.path);
+            }
+        }
+    }
+};
   
 
 
@@ -75,12 +87,12 @@ exports.store = async (req, res) => {
     const {titulo,pais,numeros,tipo,precio,premios}=req.body;
     const{decodedToken}= req;
     
-    //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
-    //console.log(req.body);
-    //return res.json("hola");
+        if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+  
 
     const validationError = validateCreateRifa(req.body);
     if (validationError) {
+        deleteAllReqFiles(req);
         return res.status(400).json(validationError);
     }
 
@@ -110,15 +122,7 @@ exports.store = async (req, res) => {
     console.log(premios2);
 
     try{
-/*
-      const user= await Inquilino.find("id",decodedToken? decodedToken.id:26);
-      const config= await AdminConfig.index();
-      const count = await Rifa.index(decodedToken? decodedToken.dominio:"numero1Dominio");
-      if(user.payed===0){
-        if(Number(update.numeros)>Number(config.raffle_number)){  return res.json({error:`el numero maximo de numeros para un no suscrito es ${config.raffle_number}`,code:1}) }
-        if(Number(config.raffle_count)<count.length){ return res.json({error:`el numero maximo de rifas para un no suscrito es ${config.raffle_count}`,code:2}) }
-      }
-*/
+
 
   let image ;   
   if (req.files) {
@@ -134,6 +138,7 @@ exports.store = async (req, res) => {
         const response=  await Rifa.store(decodedToken? decodedToken.dominio:"numero1Dominio",titulo, precio,pais,image? image:"",numeros,tipo,premios2);
         return res.json({mensaje:"rifa creada con exito"});
     }catch(e){
+        deleteAllReqFiles(req);
         console.log(e.message);
     }
     
@@ -179,7 +184,7 @@ exports.delete  = async(req,res)=>{
     const id= req.params.id;
     const{decodedToken}= req;
  
-    //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+        if(!decodedToken){return res.json({error:"dominio no encontrado"});}
    try{
     const aa= await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
     if(!aa){  return res.json({error:"objeto no encontrado"});}
@@ -219,17 +224,19 @@ exports.update = async (req, res) => {
     const update = req.body;
     const{decodedToken}= req;
   
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
     // Validar los campos recibidos
     const invalidFields = Object.keys(update).filter(key => !validateFields.includes(key));
     if (invalidFields.length > 0) {
+        deleteAllReqFiles(req);
         return res.status(400).json({ error: `Campos inválidos: ${invalidFields.join(', ')}` });
     }
 
     // Validar los datos de la rifa
     const validationError = validateUpdateRifa(update);
     if (validationError) {
+        deleteAllReqFiles(req);
         return res.status(400).json(validationError);
     }
     try {
@@ -243,22 +250,16 @@ exports.update = async (req, res) => {
      }
 
 
-    // Invertir el array de premios si el tipo es "anticipado"
+    
     const pr = async(update)=>{
       if(typeof update.premios === "string"){
         try {
           const pr1 = JSON.parse(update.premios);
-         
             return pr1;
-          
         } catch (error) {
-          
         }
       }else{
-        
           return update.premios;
-        
-
       }
     }
 
@@ -300,12 +301,13 @@ exports.update = async (req, res) => {
 
         const response = await Rifa.update(decodedToken? decodedToken.dominio:"numero1Dominio", id, updates);
         if (response.affectedRows === 0) {
-            return res.status(404).json({ mensaje: "No se encontró la rifa para actualizar" });
+            return res.status(404).json({ error: "No se encontró la rifa para actualizar" });
         }
         return res.json({ mensaje: "Rifa actualizada con éxito" });
     } catch (e) {
         console.log(e);
-        return res.status(500).json({ mensaje: "Error al actualizar la rifa" });
+        deleteAllReqFiles(req);
+        return res.status(500).json({ error: "Error al actualizar la rifa" });
     }
 };
 
@@ -653,7 +655,7 @@ const agruparPorUsuario = (items) => {
     
     
         const premios = JSON.parse(a.prizes);
-        const premios2 = a.type == "anticipados" ? premios.map(obj => ({ ...obj })).reverse() : premios;
+       
         const rifa= {
             id: a.id,
             titulo: a.tittle,
@@ -662,7 +664,7 @@ const agruparPorUsuario = (items) => {
             numeros: a.numbers,
             tipo: a.type,
             imagen: a.image,
-            premios: premios2,
+            premios: premios,
            
         };
         return res.json(rifa);

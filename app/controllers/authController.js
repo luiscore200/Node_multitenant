@@ -46,7 +46,7 @@ exports.login = async (req, res) => {
             const status= await subs(email);
              
         if(status){
-            console.log("status",status);
+           // console.log("status",status);
             const payed = usuario2.payed==0?false:true;
             if(status.payed!==payed || usuario2.id_subscription!==status.id){
               //  console.log("necesita actualizar");
@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
                 }
             }
 
-        }else{console.log("status no es booleano")};
+        }
             
         }
       
@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
         const domain = `${usuario.domain}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
-        res.json({mensaje:"Has logeado correctamente", access_token:token, user: { id: usuario.id,name:usuario.name, domain:usuario.domain, email: usuario.email, country:usuario.country, role: usuario.role,payed:usuario.payed,id_subscription:usuario.id_subscription },main_domain: domain });
+        res.json({mensaje:"Has logeado correctamente", access_token:token, user:payload,main_domain: domain });
    
     } catch (error) {
         console.error('Error en la autenticación:', error);
@@ -165,9 +165,9 @@ exports.register = async (req, res) => {
             if(data.results[0].status==="authorized"){
                 return {payed:true,id:subscriptionId};
             }else if(data.results[0].status==="paused"){
-                return {payed:false,id:subscriptionId};
+                return {payed:false,id:""};
             }else if(data.results[0].status==="cancelled"){
-                return {payed:false,id:subscriptionId};
+                return {payed:false,id:""};
             }else{
                 return  {payed:false,id:""};
             }

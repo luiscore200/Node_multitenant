@@ -8,6 +8,7 @@ const Notificaciones = require('../models/notificaciones');
 const Email = require("../notifications/mailerService");
 const Suscripciones = require("../models/suscripciones");
 const Subscriptions = require('../models/suscripciones');
+const { validateUpdateAdminConfig } = require('../validators/adminConfigValidator');
 
 const getDestinationPath = (fieldname) => {
   const adminFields = ['banner_1', 'banner_2', 'banner_3', 'app_logo', 'app_icon'];
@@ -80,7 +81,9 @@ exports.saveConfig = async(req,res)=>{
     if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
     if(decodedToken.role!=="admin"){return res.status(400).json({error:"No autorizado"})}
     
-    
+    const validate = validateUpdateAdminConfig(req.body);
+    if(validate!==null){deleteAllReqFiles(req); return res.json({error:validate});}
+
   try {
     
    // console.log(update);

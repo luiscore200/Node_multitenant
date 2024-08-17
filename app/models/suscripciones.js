@@ -75,6 +75,24 @@ class Subscriptions {
         }
     }
 
+     
+  static async find(key, value) {
+    try {
+      const [results] = await connection.execute(`SELECT * FROM  subscriptions WHERE ${key} = ?`, [value]);
+    
+      const result = results[0];
+      result.whatsapp = result.whatsapp===0?false:true;
+      result.banners = result.banners===0?false:true;
+      result.email = result.email===0?false:true;
+
+      return result;
+      
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
     // Método para eliminar todas las suscripciones
     static async deleteAll() {
         try {
