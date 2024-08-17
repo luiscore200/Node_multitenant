@@ -328,8 +328,8 @@ const updateSubs = async (array) => {
         obj.sub_id,
         obj.url,
         obj.image,
-        obj.max_raffle,
-        obj.max_num,
+        Number(obj.max_raffle),
+        Number(obj.max_num),
         obj.whatsapp,
         obj.banners,
         obj.email
@@ -341,8 +341,8 @@ const updateSubs = async (array) => {
         subs_id: obj.subs_id,
         url: obj.url,
         image: obj.image,
-        max_raffle: obj.max_raffle,
-        max_num: obj.max_num,
+        max_raffle: Number(obj.max_raffle),
+        max_num: Number(obj.max_num),
         whatsapp: obj.whatsapp,
         banners: obj.banners,
         email: obj.email
