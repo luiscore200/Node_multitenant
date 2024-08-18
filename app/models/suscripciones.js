@@ -7,6 +7,7 @@ class Subscriptions {
             const query = `
             CREATE TABLE IF NOT EXISTS subscriptions (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+                sub_id VARCHAR(255) DEFAULT "",
                 name VARCHAR(255) DEFAULT "",
                 url VARCHAR(255) DEFAULT "",
                 image VARCHAR(255) DEFAULT "",
