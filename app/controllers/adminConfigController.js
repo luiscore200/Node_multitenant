@@ -163,8 +163,9 @@ function findPath(name) {
   return "";
 }
 
-if(update['subscriptions']){
 
+if(update['subscriptions']){
+//console.log("hola");
  try {
   const suscripciones = JSON.parse(update['subscriptions']);
   if(suscripciones.length>0){
