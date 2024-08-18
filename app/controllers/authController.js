@@ -162,6 +162,7 @@ exports.register = async (req, res) => {
             return {payed:false,id:""};
          }else{
             const subscriptionId = data.results[0]["subscription_id"];
+            console.log(subscriptionId);
             if(data.results[0].status==="authorized"){
                 return {payed:true,id:subscriptionId};
             }else if(data.results[0].status==="paused"){
