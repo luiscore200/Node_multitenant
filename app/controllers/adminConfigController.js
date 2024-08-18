@@ -344,7 +344,7 @@ const updateSubs = async (array) => {
       
       await Suscripciones.update(obj.id, {
         name: obj.name,
-        subs_id: obj.subs_id,
+        sub_id: obj.sub_id,
         url: obj.url,
         image: obj.image,
         max_raffle: Number(obj.max_raffle),
