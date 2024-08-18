@@ -170,7 +170,9 @@ if(update['subscriptions']){
   if(suscripciones.length>0){
     suscripciones.forEach((subscription) => {
       const imagePath = findPath(subscription.image);
+      console.log(imagePath);
       if (imagePath) { 
+        
         subscription.image = imagePath;
       }
     });
