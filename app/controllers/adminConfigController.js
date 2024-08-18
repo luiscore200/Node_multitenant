@@ -172,7 +172,6 @@ if(update['subscriptions']){
       const imagePath = findPath(subscription.image);
       
       if (imagePath) { 
-        console.log("imagen",imagePath);
         subscription.image = imagePath;
       }
     });
@@ -295,8 +294,10 @@ exports.generalConfig = async (req, res) => {
     const config = await Config.index(); // Supongo que Config.index() devuelve el objeto de configuración
     
     const processedConfig = processConfigForClient(config,false);
+    const sus = await Suscripciones.index();
 
-    return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig});
+
+    return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig,subscriptions:sus});
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error al obtener la configuración.' });
