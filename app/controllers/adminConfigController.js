@@ -181,7 +181,7 @@ if(update['subscriptions']){
 
  } catch (error) {
      deleteAllReqFiles(req);
-     console.log(error.error);
+     console.log(error);
      return res.json({error:"Formato de suscripcion no valido"});
 
  }
