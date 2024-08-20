@@ -281,7 +281,7 @@ exports.index = async (req, res) => {
     const sus = await Suscripciones.index();
     const processedConfig = processConfigForClient(config,true);
     for (const obj of sus) {
-       obj.image = obj.image!==""?  baseUrl + '/' + obj.image.replace('..\\', '').replace(/\\/g, '/') : '';
+       obj.image = obj.image!==""?  baseUrl + '/' + obj.image.replace('..\\', '').replace('..//','').replace(/\\/g, '/') : '';
     }
     
 
