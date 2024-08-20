@@ -280,6 +280,9 @@ exports.index = async (req, res) => {
     const config = await Config.index(); // Supongo que Config.index() devuelve el objeto de configuración
     const sus = await Suscripciones.index();
     const processedConfig = processConfigForClient(config,true);
+    for (const obj of sus) {
+       obj.image = obj.image!==""?  baseUrl + '/' + obj.image.replace('..\\', '').replace(/\\/g, '/') : '';
+    }
     
 
     return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig,subscriptions:sus});
