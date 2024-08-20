@@ -7,6 +7,7 @@ const fs = require('fs');
 const Config = require("../../models/inquilino/config");
 const Email2 = require('../../notifications/mailerService2');
 const { validateConfigUpdate } = require('../../validators/configValidator');
+const Subscriptions = require('../../models/suscripciones');
 
 
 
@@ -14,10 +15,11 @@ const { validateConfigUpdate } = require('../../validators/configValidator');
 exports.sendQr = async (req, res) => {
     const { decodedToken } = req;
 
-    //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+    if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
 
     try {
-       
+        const sub = await Subscriptions.find("sub_id",decodedToken.id_subscription);
+        if(sub && !sub.whatsapp){return res.json({error:"tu plan no incluye whatsapp"});}
 
         const dominio = decodedToken?decodedToken.dominio:"numero1Dominio"; // Si no hay dominio en el token, usa "numero1Dominio"
 
@@ -52,13 +54,17 @@ exports.verifyConection= async(req,res)=>{
 
     const { decodedToken } = req;
 
-    //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+    if (!decodedToken) {return res.status(400).json({ error: "Dominio no encontrado" })}
+
+    
     try{
+        const sub = await Subscriptions.find("sub_id",decodedToken.id_subscription);
+        if(sub && !sub.whatsapp){return res.json({error:"tu plan no incluye whatsapp"});}
        //await whatsapp2.getContacts("numero1Dominio");
        // await whatsapp2.sendMessage("numero1Dominio", '+57 3177229993', 'Hola, este es un mensaje de prueba!');
 
     for (let index = 0; index < 24; index++) {
-         whatsapp2.addMessageToQueue("numero1Dominio",'+57 3216396330',"Hola, este es un mensaje de prueba");
+         whatsapp2.addMessageToQueue(decodedToken.dominio,'+57 3219876540',"Hola, este es un mensaje de prueba");
         
     }
     whatsapp2.sendAll();
@@ -75,7 +81,7 @@ exports.verifyConection= async(req,res)=>{
 exports.exportConfig = async(req,res)=>{
     const { decodedToken } = req;
 
-    //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+    if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
     try{
       const conf=  await Config.index(decodedToken?decodedToken.dominio:"numero1Dominio")
       //  await whatsapp.addMessageToQueue(decodedToken?decodedToken.dominio:"numero1Dominio","333311232323","¡Hola este es un mensaje de prueba!")
@@ -97,8 +103,11 @@ exports.verifyGmail = async(req,res)=>{
 
   //  return res.json(req.body);
 
-    //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+    if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
     try{
+        const sub = await Subscriptions.find("sub_id",decodedToken.id_subscription);
+          if(sub && !sub.whatsapp){return res.json({error:"tu plan no incluye Email"})}
+
         await Email2.verifyEmail(decodedToken?decodedToken.dominio:"numero1Dominio",email,password);
         
               return res.json({mensaje:"Email verificado con exito"});
@@ -118,7 +127,9 @@ exports.saveConfig = async(req,res)=>{
 
     //return res.json(req.body);
 
-    //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+    if (!decodedToken) {return res.status(400).json({ error: "Dominio no encontrado." })}
+
+    
 
     const validationError = validateConfigUpdate(update);
     if (validationError) {
@@ -127,8 +138,9 @@ exports.saveConfig = async(req,res)=>{
 
 
    try {
+    const sub = await Subscriptions.find("sub_id",decodedToken.id_subscription);
     const conf=  await Config.index(decodedToken?decodedToken.dominio:"numero1Dominio");
-
+    let bad = false;
     
     const atributosCambiados = [];
 
@@ -143,14 +155,19 @@ exports.saveConfig = async(req,res)=>{
 
 
     if(atributosCambiados.find(obj => obj==="phone_status")){
-        const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"phone_status":update.phone_status});
+        if(sub && sub.whatsapp){
+            const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"phone_status":update.phone_status});
+        }else{
+            bad=true;
+            const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"phone_status":false});
+        }
     }
 
     if(atributosCambiados.find(obj => obj==="phone_verified")){
         const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"phone_verified":update.phone_verified});
     }
     if(atributosCambiados.find(obj => obj==="phone_verified") && atributosCambiados.find(obj => obj==="phone_status") ){
-        if(update.phone_verified===1 && update.phone_status===1){
+        if(sub && update.phone_verified && update.phone_status && sub.whatsapp){
             //encender whatsapp
             startWp(decodedToken?decodedToken.dominio:"numero1Dominio");
         } 
@@ -168,14 +185,20 @@ exports.saveConfig = async(req,res)=>{
    }
 
    if(atributosCambiados.find(obj => obj==="email_status")){
-    const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"email_status":update.email_status});
+        if(sub && sub.email){
+            const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"email_status":update.email_status});
+        }else{
+            bad=true;
+            const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"email_status":false});
+        }
+    
 }
 if(atributosCambiados.find(obj => obj==="email_verified")){
     const updated = await Config.update(decodedToken?decodedToken.dominio:"numero1Dominio",{"email_verified":update.email_verified});
 }
 
 if(atributosCambiados.find(obj => obj==="email_verified") && atributosCambiados.find(obj => obj==="email_status") ){
-    if(update.email_verified===1 && update.email_status===1){
+    if(sub && update.email_verified && update.email_status && sub.email){
         //encender email
         startGmail(decodedToken?decodedToken.dominio:"numero1Dominio");
     } 
@@ -185,11 +208,15 @@ if(atributosCambiados.find(obj => obj==="email_verified") && atributosCambiados.
 
 
    
-   return res.json({mensaje:"configuracion actualizada con exito"});
+   if(!bad){
+    return res.json({mensaje:"configuracion actualizada con exito"});
+   }else{
+    return res.json({mensaje:"Guardado, Algunos cambios no se ajustan a tu plan"});
+   }
 
    } catch (error) {
     console.log(error);
-    return res.json({error:error.message});
+    return res.json({error:"Ha ocurrido un error al guardar"});
    }
 
 

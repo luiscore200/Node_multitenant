@@ -91,6 +91,10 @@ exports.validateUpdateAdminConfig = (body) => {
       if (obj.email !== undefined && typeof obj.email !== "boolean") {
         return `Email en el objeto suscripción[${i}] debe ser un booleano`;
       }
+
+      if (obj.share !== undefined && typeof obj.share !== "boolean") {
+        return `Compartir en el objeto suscripción[${i}] debe ser un booleano`;
+      }
     }
   }
 

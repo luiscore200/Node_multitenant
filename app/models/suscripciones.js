@@ -7,7 +7,7 @@ class Subscriptions {
             const query = `
             CREATE TABLE IF NOT EXISTS subscriptions (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                sub_id VARCHAR(255) DEFAULT "",
+                sub_id VARCHAR(255) UNIQUE DEFAULT "",
                 name VARCHAR(255) DEFAULT "",
                 url VARCHAR(255) DEFAULT "",
                 image VARCHAR(255) DEFAULT "",
@@ -15,7 +15,8 @@ class Subscriptions {
                 max_num INT DEFAULT 10000,
                 whatsapp BOOLEAN DEFAULT false,
                 banners BOOLEAN DEFAULT false,
-                email BOOLEAN DEFAULT false
+                email BOOLEAN DEFAULT false,
+                share BOOLEAN DEFAULT false,
             );
 
 
@@ -29,11 +30,11 @@ class Subscriptions {
     }
 
 
-    static async store(name,sub_id,url,image,max_raffle,max_num,whatsapp,banners,email) {
+    static async store(name,sub_id,url,image,max_raffle,max_num,whatsapp,banners,email,share) {
         try {
             const [results] = await connection.execute(
-                `INSERT INTO subscriptions (  name, sub_id, url, image, max_raffle, max_num, whatsapp, banners , email) VALUES ( ?, ?, ?, ?, ?, ?, ?,?, ?)`,
-                [  name, sub_id, url, image, max_raffle, max_num, whatsapp, banners,email]
+                `INSERT INTO subscriptions (  name, sub_id, url, image, max_raffle, max_num, whatsapp, banners , email,share) VALUES ( ?, ?, ?, ?, ?, ?, ?,?, ?,?)`,
+                [  name, sub_id, url, image, max_raffle, max_num, whatsapp, banners,email,share]
             );
             return results;
         } catch (error) {
@@ -45,16 +46,23 @@ class Subscriptions {
     // Método para obtener todas las suscripciones
     static async index() {
         try {
-            const [results] = await connection.execute(
-                `SELECT * FROM subscriptions`
-            );
-            return results;
+            const [results] = await connection.execute(`SELECT * FROM subscriptions`);
+    
+            const mappedResults = results.map(result => ({
+                ...result,
+                whatsapp: result.whatsapp === 0 ? false : true,
+                banners: result.banners === 0 ? false : true,
+                email: result.email === 0 ? false : true,
+                share: result.share === 0 ? false : true
+            }));
+    
+            return mappedResults;
         } catch (error) {
             console.error('Error fetching subscriptions:', error);
             throw error;
         }
     }
-
+    
     static async update(id, updates) {
         try {
             const fields = [];
@@ -85,6 +93,7 @@ class Subscriptions {
       result.whatsapp = result.whatsapp===0?false:true;
       result.banners = result.banners===0?false:true;
       result.email = result.email===0?false:true;
+      result.share = result.share===0?false:true;
 
       return result;
       

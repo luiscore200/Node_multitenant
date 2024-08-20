@@ -11,6 +11,7 @@ const fixDatabase = require('../database/inquilino/fixDatabase.js');
 const subdomains = require('../utils/updateDomains.js');
 const {validateCreateUser} = require('../validators/userValidator.js');
 
+
 exports.login = async (req, res) => {
    
 
@@ -75,7 +76,7 @@ exports.login = async (req, res) => {
         const usuario = await User.find('email',email);
 
         // Si las credenciales son correctas, generar un token JWTus
-        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed,id_subscription:usuario.id_suscription };
+        const payload = {  id: usuario.id,name: usuario.name,dominio: usuario.domain,phone:usuario.phone,email: usuario.email,pais: usuario.country,role: usuario.role,payed:usuario.payed,id_subscription:usuario.id_subscription };
         const token = jwt.generateToken(payload, '24h');
         console.log("access_token: "+token);
 

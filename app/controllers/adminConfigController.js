@@ -342,7 +342,8 @@ const updateSubs = async (array) => {
         Number(obj.max_num),
         obj.whatsapp,
         obj.banners,
-        obj.email
+        obj.email,
+        obj.share
       );
     } else {
       
@@ -355,7 +356,8 @@ const updateSubs = async (array) => {
         max_num: Number(obj.max_num),
         whatsapp: obj.whatsapp,
         banners: obj.banners,
-        email: obj.email
+        email: obj.email,
+        share: obj.share
       });
     }
   }

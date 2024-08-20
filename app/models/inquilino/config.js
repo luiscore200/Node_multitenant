@@ -49,6 +49,11 @@ class Config {
                 config.password_email = decryptedPassword;
             }
 
+            config.phone_status= config.phone_status===0?false:true;
+            config.phone_verified = config.phone_verified===0?false:true;
+            config.email_status = config.email_status===0?false:true;
+            config.email_verified = config.email_verified===0?false:true;
+
             return config;
         } catch (error) {
             throw error;

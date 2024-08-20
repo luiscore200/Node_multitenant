@@ -16,6 +16,8 @@ const fs = require('fs').promises;
 const fs2 = require("fs");
 const path = require('path');
 require('dotenv').config();
+const Suscripciones = require("../../models/suscripciones");
+
 
 
 const baseUrl = process.env.MAIN_DOMAIN;
@@ -88,7 +90,7 @@ exports.store = async (req, res) => {
     const{decodedToken}= req;
     
         if(!decodedToken){return res.json({error:"dominio no encontrado"});}
-  
+        
 
     const validationError = validateCreateRifa(req.body);
     if (validationError) {
@@ -96,7 +98,17 @@ exports.store = async (req, res) => {
         return res.status(400).json(validationError);
     }
 
-    
+    try{
+
+    ////////////////
+    console.log("el id_subscription es ",decodedToken.id_subscription);
+    const subs = Suscripciones.find("sub_id",decodedToken.id_subscription);
+    console.log("la suscripcion especifica es ",subs);
+    if( subs!==null && numeros > subs.max_num){ return res.json({error:"La cantidad de numeros supera la otorgada por tu plan"}); }
+    const raffles = await Rifa.countRaffles(!decodedToken.dominio);
+    console.log("el numero de rifas es ",raffles);
+    if(subs!==null && raffles>=subs.max_raffle){return res.json({error:"has ocupado el maximo de rifas permitidasp or ut plan"});}
+    ////////////////
 
     const pr = async(update)=>{
       if(typeof update.premios === "string"){
@@ -121,7 +133,7 @@ exports.store = async (req, res) => {
     const premios2 = await pr(req.body);
     console.log(premios2);
 
-    try{
+   
 
 
   let image ;   
@@ -226,6 +238,7 @@ exports.update = async (req, res) => {
   
      if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
+
     // Validar los campos recibidos
     const invalidFields = Object.keys(update).filter(key => !validateFields.includes(key));
     if (invalidFields.length > 0) {
@@ -241,6 +254,11 @@ exports.update = async (req, res) => {
     }
     try {
     
+  ///////////////
+     const subs = Suscripciones.find("sub_id",decodedToken.id_subscription);
+     console.log("la suscripcion especifica es ",subs);
+   if(subs!==null && update.numeros > subs.max_num){ return res.json({error:"La cantidad de numeros supera la otorgada por tu plan"}); }
+//////////////////
     
 
      const rifa = await Rifa.find(decodedToken? decodedToken.dominio:"numero1Dominio","id",id);
@@ -316,7 +334,7 @@ exports.getNumeros = async (req, res) => {
 
     const{decodedToken}= req;
     
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
       
 
     try {
@@ -346,7 +364,7 @@ exports.getNumeros = async (req, res) => {
     const { id } = req.params;
  
     
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
     const used = await usedTokens.getTokens();
     if(used.length>0){
@@ -404,7 +422,7 @@ exports.getNumeros = async (req, res) => {
   exports.getSeparados = async (req, res) => {
     const{decodedToken}= req;
     const { id } = req.params;
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
     
     try {
         await Asignaciones.eliminarAntiguasSeparadas(decodedToken ? decodedToken.dominio : "numero1Dominio");
@@ -424,7 +442,7 @@ exports.getNumeros = async (req, res) => {
   exports.eliminarSeparados = async (req, res) => {
     const{decodedToken}= req;
     const { id } = req.params;
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
     
     try {
 
@@ -449,9 +467,12 @@ exports.getNumeros = async (req, res) => {
   exports.confirmarSeparados = async (req, res) => {
     const{decodedToken}= req;
     const { id } = req.params;
-    // if(!decodedToken){return res.json({error:"dominio no encontrado"});}
-  
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+
+    
+    
     try {
+      const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
       const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
      
      // return res.json(conf);
@@ -465,26 +486,35 @@ exports.getNumeros = async (req, res) => {
         //   rifa.prizes = JSON.parse(rifa.prizes);
             console.log(rifa);
 
-      if(conf){
-            if(conf.email_status===1 && conf.email_verified===1){
+      if(conf && sub!==null){
+
+        //////////////////
+            if(!sub.whatsapp && conf.phone_status){
+              Inquilino.update(decodedToken.id,{phone_status:false})
+            }
+            if(!sub.email && conf.email_status){
+              Inquilino.update(decodedToken.id,{email_status:false})
+            }
+        //////////////////////
+
+            if(sub.email && conf.email_status && conf.email_verified){
               sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
               sendMail2.sendAll();
              
             }
-            if(conf.email_status===0 || conf.email_verified===0){
+            if(!sub.email || !conf.email_status || !conf.email_verified){
               sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
               sendMail.sendAll();
-
-              
-             
             }
-            
-            if(conf.phone_status===1 && conf.phone_verified===1){
+
+          
+            if( sub.whatsapp && conf.phone_status && conf.phone_verified){
            
               whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a,rifa.prizes));
               whatsappService3.sendAll();
               
             }
+           
 
       }else{
         sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
@@ -507,8 +537,11 @@ exports.getNumeros = async (req, res) => {
     const index = req.body.index;
     const { decodedToken } = req;
 
+    if(!decodedToken){return res.json({error:"Dominio no encontrado"});}
+
     try {
       const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
+      const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
         // Buscar la rifa por ID
         const a = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", id);
         if (!a) {
@@ -547,17 +580,29 @@ exports.getNumeros = async (req, res) => {
 
             if (ganador && email === ganador.purchaser_email && pagado.length>0) {
              
-              if(conf){
-                if(conf.email_status===1 && conf.email_verified===1){
+              if(conf && sub!==null){
+
+                
+        //////////////////
+            if(!sub.whatsapp && conf.phone_status){
+              Inquilino.update(decodedToken.id,{phone_status:false})
+            }
+            if(!sub.email && conf.email_status){
+              Inquilino.update(decodedToken.id,{email_status:false})
+            }
+        //////////////////////
+
+
+                if(sub.email &&  conf.email_status && conf.email_verified){
                   sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_email,"¡Has ganado!",rifaGanador(ganador,update,index));
                   sendMail2.sendAll();
                 }
-                if(conf.email_status===0 || conf.email_verified===0){
+                if(!sub.email || !conf.email_status || !conf.email_verified){
                   sendMail.addMessageToQueue(ganador.purchaser_email,"¡Has ganado!",rifaGanador(ganador,update,index));
                   sendMail.sendAll();
                 }
                 
-                if(conf.phone_status===1 && conf.phone_verified===1){
+                if(sub.whatsapp && conf.phone_status && conf.phone_verified){
                   whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_phone,rifaPlantillasWp.rifaGanadorWhatsApp(ganador,update,index))
                   whatsappService2.sendAll();
                 }
@@ -572,17 +617,27 @@ exports.getNumeros = async (req, res) => {
 
             } else if (ganador && email === ganador.purchaser_email  && pagado.length===0) {
 
-              if(conf){
-                if(conf.email_status===1 && conf.email_verified===1){
+              if(conf && sub!==null){
+
+                  //////////////////
+            if(!sub.whatsapp && conf.phone_status){
+              Inquilino.update(decodedToken.id,{phone_status:false})
+            }
+            if(!sub.email && conf.email_status){
+              Inquilino.update(decodedToken.id,{email_status:false})
+            }
+        //////////////////////
+
+                if(sub.email && conf.email_status && conf.email_verified){
                   sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_email,"¡Tu numero ha jugado!",rifaGanadorDeudor(ganador,update,index));
                   sendMail2.sendAll();
                 }
-                if(conf.email_status===0 || conf.email_verified===0){
+                if(!sub.email || !conf.email_status || !conf.email_verified){
                   sendMail.addMessageToQueue(ganador.purchaser_email,"¡Tu numero ha jugado!",rifaGanadorDeudor(ganador,update,index));
                   sendMail.sendAll();
                 }
                 
-                if(conf.phone_status===1 && conf.phone_verified===1){
+                if(sub.whatsapp && conf.phone_status && conf.phone_verified){
                   whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",ganador.purchaser_phone,rifaPlantillasWp.rifaGanadorDeudorWhatsApp(ganador,update,index))
                   whatsappService2.sendAll();
                 }
@@ -598,17 +653,28 @@ exports.getNumeros = async (req, res) => {
 
               const obj = elementos[0];
 
-              if(conf){
-                if(conf.email_status===1 && conf.email_verified===1){
+              if(conf && sub!==null){
+
+                //////////////////
+                if(!sub.whatsapp && conf.phone_status){
+                  Inquilino.update(decodedToken.id,{phone_status:false})
+                }
+                if(!sub.email && conf.email_status){
+                  Inquilino.update(decodedToken.id,{email_status:false})
+                }
+            //////////////////////
+
+
+                if(sub.email && conf.email_status && conf.email_verified){
                   sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",email,"¡Has ganado!",rifaNoGanador(obj,update,index));
                   sendMail2.sendAll();
                 }
-                if(conf.email_status===0 || conf.email_verified===0){
+                if(!sub.email || !conf.email_status|| !conf.email_verified){
                   sendMail.addMessageToQueue(email,"¡Has ganado!",rifaNoGanador(obj,update,index));
                   sendMail.sendAll();
                 }
                 
-                if(conf.phone_status===1 && conf.phone_verified===1){
+                if(sub.whatsapp && conf.phone_status && conf.phone_verified){
                   whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",obj.purchaser_phone,
                     rifaPlantillasWp.rifaNoGanadorWhatsApp(obj,update,index))
                   whatsappService2.sendAll();
@@ -645,11 +711,15 @@ const agruparPorUsuario = (items) => {
     }, {});
 };
 
+
+
   exports.rifaFind = async (req,res)=>{
     const { id } = req.params;
     const{decodedToken}= req;
     
+    if(!decodedToken){return res.json({error:"Dominio no encontrado"});}
     try{
+
         const a= await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",id)
         if(!a){return res.json({error:"rifa no encontrada"})}
     
