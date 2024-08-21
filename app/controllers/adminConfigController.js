@@ -211,10 +211,10 @@ if (update['subscriptions']) {
             item.email=subscription.email;
           }
            if(subscription.max_num !== obj.max_num){
-          item.max_num=subscription.max_num;
+          item.max_num=Number(subscription.max_num);
           }
           if(subscription.max_raffle !== obj.max_raffle){
-            item.max_raffle=subscription.max_raffle;
+            item.max_raffle=Number(subscription.max_raffle);
           }
           if(subscription.share !== obj.share){
           item.share=subscription.share;
