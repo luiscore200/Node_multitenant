@@ -105,7 +105,7 @@ exports.store = async (req, res) => {
     const subs =await Suscripciones.find("sub_id",decodedToken.id_subscription);
     console.log("la suscripcion especifica es ",subs);
     if( subs!==null && numeros > subs.max_num){ return res.json({error:"La cantidad de numeros supera la otorgada por tu plan"}); }
-    const raffles = await Rifa.countRaffles(!decodedToken.dominio);
+    const raffles = await Rifa.countRaffles(decodedToken.dominio);
     console.log("el numero de rifas es ",raffles);
     if(subs!==null && raffles>=subs.max_raffle){return res.json({error:"has ocupado el maximo de rifas permitidasp or ut plan"});}
     ////////////////
