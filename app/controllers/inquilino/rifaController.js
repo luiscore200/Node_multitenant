@@ -102,7 +102,7 @@ exports.store = async (req, res) => {
 
     ////////////////
     console.log("el id_subscription es ",decodedToken.id_subscription);
-    const subs = Suscripciones.find("sub_id",decodedToken.id_subscription);
+    const subs =await Suscripciones.find("sub_id",decodedToken.id_subscription);
     console.log("la suscripcion especifica es ",subs);
     if( subs!==null && numeros > subs.max_num){ return res.json({error:"La cantidad de numeros supera la otorgada por tu plan"}); }
     const raffles = await Rifa.countRaffles(!decodedToken.dominio);
@@ -255,7 +255,7 @@ exports.update = async (req, res) => {
     try {
     
   ///////////////
-     const subs = Suscripciones.find("sub_id",decodedToken.id_subscription);
+     const subs =await Suscripciones.find("sub_id",decodedToken.id_subscription);
      console.log("la suscripcion especifica es ",subs);
    if(subs!==null && update.numeros > subs.max_num){ return res.json({error:"La cantidad de numeros supera la otorgada por tu plan"}); }
 //////////////////
