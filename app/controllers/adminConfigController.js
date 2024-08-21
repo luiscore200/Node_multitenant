@@ -308,6 +308,11 @@ exports.generalConfig = async (req, res) => {
     
     const processedConfig = processConfigForClient(config,false);
     const sus = await Suscripciones.index();
+    for (const obj of sus) {
+      
+      obj.image = obj.image !== ""  ? baseUrl + '/' + obj.image.replace(/(\.\.\/|\\)/g, '').replace(/\\/g, '/') : '';
+  
+    }
 
 
     return res.json({mensaje:"Configuracion cargada con exito",config:processedConfig,subscriptions:sus});
