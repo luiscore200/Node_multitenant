@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
                 update(usuario2,status);
         
             }
-            if(status===payed){
+            if(status.payed===payed){
                 // console.log("no necesita actualizar");
                 if(payed===true){
                     await Notificaciones.deleteFrom(dominio,"code",310);
