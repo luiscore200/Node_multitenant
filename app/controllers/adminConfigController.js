@@ -179,9 +179,15 @@ if (update['subscriptions']) {
           if (subscription.id) {
             const obj = sus.find(obj => obj.id === subscription.id);
        //     console.log("el objeto comparado es",obj);
-            if (obj && obj.image !== "" && imagePath.path!==null) {
+            if (obj  && imagePath.path!==null) {
+              if( obj.image !== ""){
                 await deleteImage(path.join(__dirname, obj.image));
-               item.image= imagePath.path;
+                item.image= imagePath.path;
+              }else{
+                item.image= imagePath.path;
+              }
+               
+               
                
             }
            
