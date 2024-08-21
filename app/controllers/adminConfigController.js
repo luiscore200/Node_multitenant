@@ -411,9 +411,12 @@ const updateSubs = async (array) => {
         obj.share
       );
     } else {
-    
+
+      const propertyCount = Object.keys(obj).length;
+      if (propertyCount > 1) {
+        await Suscripciones.update(obj.id, obj);
+      } 
       
-      await Suscripciones.update(obj.id, obj);
       
     }
   }

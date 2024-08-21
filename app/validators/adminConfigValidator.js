@@ -38,7 +38,6 @@ exports.validateUpdateAdminConfig = (body) => {
     return 'Se esperaba recibir un string en el campo App Icono';
   }
 
-/*
   if (subcriptions) {
     if (typeof subcriptions !== "string") {
       return 'Se esperaba recibir un string en el campo suscripciones';
@@ -97,7 +96,7 @@ exports.validateUpdateAdminConfig = (body) => {
         return `Compartir en el objeto suscripción[${i}] debe ser un booleano`;
       }
     }
-  }*/
+  }
 
   return null;
 };
