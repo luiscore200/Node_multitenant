@@ -164,31 +164,36 @@ function findPath(name) {
 }
 
 
-if(update['subscriptions']){
-//console.log("hola");
- try {
-  const suscripciones = JSON.parse(update['subscriptions']);
-  if(suscripciones.length>0){
-    suscripciones.forEach((subscription) => {
-      const imagePath = findPath(subscription.image);
-      
-      if (imagePath) { 
-        subscription.image = imagePath;
+if (update['subscriptions']) {
+  try {
+    const sus = await Subscriptions.index();
+    const suscripciones = JSON.parse(update['subscriptions']);
+    
+    if (suscripciones.length > 0) {
+      for (const subscription of suscripciones) {
+        const imagePath = findPath(subscription.image);
+        
+        if (imagePath) {
+          if (subscription.id) {
+            const obj = sus.find(obj => obj.id === subscription.id);
+            if (obj && obj.image !== "") {
+              await deleteImage(path.join(__dirname, obj.image));
+            }
+          }
+          subscription.image = imagePath;
+        }
       }
-    });
+    }
 
-  }
     await updateSubs(suscripciones);
- // console.log(suscripciones);
 
- } catch (error) {
-     deleteAllReqFiles(req);
-     console.log(error);
-     return res.json({error:"Formato de suscripcion no valido"});
-
- }
-
+  } catch (error) {
+    deleteAllReqFiles(req);
+    console.log(error);
+    return res.json({ error: "Formato de suscripción no válido" });
+  }
 }
+
    
   
    
@@ -274,16 +279,15 @@ exports.index = async (req, res) => {
   const { decodedToken } = req;
 
   
-  //if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
-  //if(decodedToken.role!=="admin"){return res.status(400).json({error:"No autorizado"});'
+  if (!decodedToken) {return res.status(400).json({ error: "Token decodificado no encontrado." })}
+  if(decodedToken.role!=="admin"){return res.status(400).json({error:"No autorizado"})};
   try {
     const config = await Config.index(); // Supongo que Config.index() devuelve el objeto de configuración
     const sus = await Suscripciones.index();
     const processedConfig = processConfigForClient(config,true);
     for (const obj of sus) {
-      obj.image = obj.image !== "" 
-      ? baseUrl + '/' + obj.image.replace(/(\.\.\/|\\)/g, '').replace(/\\/g, '/') 
-      : '';
+      
+      obj.image = obj.image !== ""  ? baseUrl + '/' + obj.image.replace(/(\.\.\/|\\)/g, '').replace(/\\/g, '/') : '';
   
     }
     
