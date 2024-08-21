@@ -151,16 +151,16 @@ if(atributosCambiados.find(obj => obj==="app_icon")){
 
 function findPath(name) {
   if (!req.files || !req.files.image || !req.files.image.length || name==="") {
-    return "";
+    return {file:false,path:name===""?"":null};
   }
   for (const file of req.files.image) {
     if (file.originalname === name) {   
-     
-        return path.relative(__dirname, file.path);
+       const pt =path.relative(__dirname, file.path);
+        return {file:true,path:pt}
     }
   }
 
-  return "";
+  return {file:false,path:null};
 }
 
 
@@ -168,26 +168,68 @@ if (update['subscriptions']) {
   try {
     const sus = await Subscriptions.index();
     const suscripciones = JSON.parse(update['subscriptions']);
+    const alterSubs=[];
     
     if (suscripciones.length > 0) {
       for (const subscription of suscripciones) {
+        const item={};
         const imagePath = findPath(subscription.image);
         
        
           if (subscription.id) {
             const obj = sus.find(obj => obj.id === subscription.id);
-            console.log("el objeto comparado es",obj);
-            if (obj && obj.image !== "") {
-              console.log("existe");
-              await deleteImage(path.join(__dirname, obj.image));
+       //     console.log("el objeto comparado es",obj);
+            if (obj && obj.image !== "" && imagePath.path!==null) {
+                await deleteImage(path.join(__dirname, obj.image));
+               item.image= imagePath.path;
+               
             }
+           
+            item.id=subscription.id;
+            if(subscription.name !== obj.name){
+                item.name=subscription.name;
+            }
+            if(subscription.url !== obj.url){
+              item.url=subscription.url;
+            }
+            if(subscription.sub_id !== obj.sub_id){
+            item.sub_id=subscription.sub_id;
+           }
+           if(subscription.whatsapp !== obj.whatsapp){
+            item.whatsapp=subscription.whatsapp;
           }
-          subscription.image = imagePath;
+          if(subscription.banners !== obj.banners){
+            item.banners=subscription.banners;
+          }
+          if(subscription.email !== obj.email){
+            item.email=subscription.email;
+          }
+           if(subscription.max_num !== obj.max_num){
+          item.max_num=subscription.max_num;
+          }
+          if(subscription.max_raffle !== obj.max_raffle){
+            item.max_raffle=subscription.max_raffle;
+          }
+          if(subscription.share !== obj.share){
+          item.share=subscription.share;
+      }
+
+          alterSubs.push(item);
+
+          }else{
+            item= subscription;
+            if(imagePath.file && item.path!==null){
+              item.image = imagePath.path;
+            }else{item.image="" }
+
+            alterSubs.push(item)
+          }
+       
         
       }
     }
-
-    await updateSubs(suscripciones);
+    await updateSubs(alterSubs);
+ //  await updateSubs(suscripciones);
 
   } catch (error) {
     deleteAllReqFiles(req);
@@ -363,19 +405,10 @@ const updateSubs = async (array) => {
         obj.share
       );
     } else {
+    
       
-      await Suscripciones.update(obj.id, {
-        name: obj.name,
-        sub_id: obj.sub_id,
-        url: obj.url,
-        image: obj.image,
-        max_raffle: Number(obj.max_raffle),
-        max_num: Number(obj.max_num),
-        whatsapp: obj.whatsapp,
-        banners: obj.banners,
-        email: obj.email,
-        share: obj.share
-      });
+      await Suscripciones.update(obj.id, obj);
+      
     }
   }
   } catch (error) {

@@ -1,5 +1,5 @@
 exports.validateUpdateAdminConfig = (body) => {
-  const { email, email_password, app_name, banner_1, banner_2, banner_3, app_logo, app_icon, subcriptions } = body;
+  const { email, email_password, app_name, banner_1, banner_2, banner_3, app_logo, app_icon} = body;
 
   if (email) {
     if (typeof email !== "string") {
@@ -38,6 +38,7 @@ exports.validateUpdateAdminConfig = (body) => {
     return 'Se esperaba recibir un string en el campo App Icono';
   }
 
+/*
   if (subcriptions) {
     if (typeof subcriptions !== "string") {
       return 'Se esperaba recibir un string en el campo suscripciones';
@@ -96,7 +97,7 @@ exports.validateUpdateAdminConfig = (body) => {
         return `Compartir en el objeto suscripción[${i}] debe ser un booleano`;
       }
     }
-  }
+  }*/
 
   return null;
 };
