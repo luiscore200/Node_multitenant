@@ -173,16 +173,17 @@ if (update['subscriptions']) {
       for (const subscription of suscripciones) {
         const imagePath = findPath(subscription.image);
         
-        if (imagePath) {
+       
           if (subscription.id) {
             const obj = sus.find(obj => obj.id === subscription.id);
+            console.log("el objeto comparado es",obj);
             if (obj && obj.image !== "") {
               console.log("existe");
               await deleteImage(path.join(__dirname, obj.image));
             }
           }
           subscription.image = imagePath;
-        }
+        
       }
     }
 
