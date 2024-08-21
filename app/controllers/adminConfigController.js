@@ -177,6 +177,7 @@ if (update['subscriptions']) {
           if (subscription.id) {
             const obj = sus.find(obj => obj.id === subscription.id);
             if (obj && obj.image !== "") {
+              console.log("existe");
               await deleteImage(path.join(__dirname, obj.image));
             }
           }
