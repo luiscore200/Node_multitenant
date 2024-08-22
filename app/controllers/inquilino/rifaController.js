@@ -161,8 +161,9 @@ exports.store = async (req, res) => {
 exports.index = async (req, res) => {
     const { decodedToken } = req;
     try {
+      console.log("aaa");
         const rifas = await Rifa.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
-        console.log("aaa");
+        
         // Utiliza map para crear un array de promesas
         const response = await Promise.all(rifas.map(async (item) => {
 
