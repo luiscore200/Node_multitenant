@@ -43,7 +43,7 @@
   
 
   exports.storeUser = async (req, res) => {
-    console.log(req.body);
+   // console.log(req.body);
     const validationError = validateCreateUser(req.body);
     if (validationError) {
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
@@ -61,7 +61,7 @@
      await createDatabase(domain);
      await fixDatabase(domain);
 
-     await subdomains();
+    // await subdomains();
      const finded = await User.find('id',created.insertId);
 
      const main = process.env.MAIN_DOMAIN;
