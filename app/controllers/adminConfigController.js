@@ -306,11 +306,11 @@ const processConfigForClient = (config, includePrivate = false) => {
   const processedConfig = {
     id: config.id,
     email: config.email,
-    banner_1: config.banner_1 ? baseUrl + '/' + config.banner_1.replace('..\\', '').replace(/\\/g, '/') : '',
-    banner_2: config.banner_2 ? baseUrl + '/' + config.banner_2.replace('..\\', '').replace(/\\/g, '/') : '',
+    banner_1: config.banner_1 ? baseUrl +  config.banner_1.replace('..', '').replace(/\\/g, '/') : '',
+    banner_2: config.banner_2 ? baseUrl +  config.banner_2.replace('..', '').replace(/\\/g, '/') : '',
     banner_3: config.banner_3 ? baseUrl  + config.banner_3.replace('..', '').replace(/\\/g, '/') : '',
-    app_logo: config.app_logo ? baseUrl + '/' + config.app_logo.replace('..\\', '').replace(/\\/g, '/') : '',
-    app_icon: config.app_icon ? baseUrl + '/' + config.app_icon.replace('..\\', '').replace(/\\/g, '/') : '',
+    app_logo: config.app_logo ? baseUrl  + config.app_logo.replace('..', '').replace(/\\/g, '/') : '',
+    app_icon: config.app_icon ? baseUrl  + config.app_icon.replace('..', '').replace(/\\/g, '/') : '',
     app_name: config.app_name,
     raffle_count: config.raffle_count,
     raffle_number: config.raffle_number
@@ -337,7 +337,7 @@ exports.index = async (req, res) => {
     const processedConfig = processConfigForClient(config,true);
     for (const obj of sus) {
       
-      obj.image = obj.image !== ""  ? baseUrl + '/' + obj.image.replace(/(\.\.\/|\\)/g, '').replace(/\\/g, '/') : '';
+      obj.image = obj.image !== ""  ? baseUrl  + obj.image.replace('..', '').replace(/\\/g, '/') : '';
   
     }
     
@@ -358,7 +358,7 @@ exports.generalConfig = async (req, res) => {
     const sus = await Suscripciones.index();
     for (const obj of sus) {
       
-      obj.image = obj.image !== ""  ? baseUrl + '/' + obj.image.replace(/(\.\.\/|\\)/g, '').replace(/\\/g, '/') : '';
+      obj.image = obj.image !== ""  ? baseUrl  + obj.image.replace('..', '').replace(/\\/g, '/') : '';
   
     }
 
