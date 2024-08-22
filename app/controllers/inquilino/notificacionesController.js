@@ -13,7 +13,7 @@ if(decodedToken && decodedToken.role==="admin"){
   const index = await adminConfig.index();
   return res.json({mensaje:"",notificaciones:index});
 }else{
-  console.log("aa");
+ 
   await config.deleteOld(decodedToken?decodedToken.dominio:"numero1Dominio");
   const index = await config.index(decodedToken?decodedToken.dominio:"numero1Dominio");
   return res.json({mensaje:"",notificaciones:index});
