@@ -308,7 +308,7 @@ const processConfigForClient = (config, includePrivate = false) => {
     email: config.email,
     banner_1: config.banner_1 ? baseUrl + '/' + config.banner_1.replace('..\\', '').replace(/\\/g, '/') : '',
     banner_2: config.banner_2 ? baseUrl + '/' + config.banner_2.replace('..\\', '').replace(/\\/g, '/') : '',
-    banner_3: config.banner_3 ? baseUrl + '/' + config.banner_3.replace('..\\', '').replace(/\\/g, '/') : '',
+    banner_3: config.banner_3 ? baseUrl  + config.banner_3.replace('..', '').replace(/\\/g, '/') : '',
     app_logo: config.app_logo ? baseUrl + '/' + config.app_logo.replace('..\\', '').replace(/\\/g, '/') : '',
     app_icon: config.app_icon ? baseUrl + '/' + config.app_icon.replace('..\\', '').replace(/\\/g, '/') : '',
     app_name: config.app_name,
