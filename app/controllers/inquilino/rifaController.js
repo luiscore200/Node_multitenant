@@ -178,7 +178,7 @@ exports.index = async (req, res) => {
                 pais: item.country,
                 numeros: item.numbers,
                 tipo: item.type,
-                imagen:  item.image ? baseUrl + item.image.replace('..','').replace('..\\', '').replace(/\\/g, '/') : '',
+                imagen:  item.image ? baseUrl + item.image.replace('..', '').replace(/\\/g, '/') : '',
                 premios:premios,
                 asignaciones: totalAsignaciones,
             };
@@ -356,6 +356,35 @@ exports.getNumeros = async (req, res) => {
   };
 
 
+
+
+  exports.indexNumeros = async (req, res) => {
+
+
+    const{decodedToken}= req;
+    
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+      
+
+    try {
+      const { id } = req.params;
+
+      await Asignaciones.eliminarAntiguasSeparadas(decodedToken? decodedToken.dominio:"numero1Dominio");
+      
+      const asignaciones = await Asignaciones.index(decodedToken? decodedToken.dominio:"numero1Dominio");
+  
+      // Extraer los números ocupados
+      
+  
+      res.json(asignaciones);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error al obtener los números ocupados' });
+    }
+  };
+
+
+
   
   exports.assignNumbers = async (req, res) => {
 
@@ -437,6 +466,8 @@ exports.getNumeros = async (req, res) => {
     }
       
   };
+
+ 
 
 
       

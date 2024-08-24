@@ -46,6 +46,7 @@ router.get('/rifa/index',[verifytoken],rifaController.index);
 router.delete('/rifa/delete/:id',[verifytoken],rifaController.delete);
 router.post('/rifa/update/:id',[verifytoken,rifaController.uploadImages],rifaController.update);
 router.get('/rifa/getNumeros/:id',[verifytoken],rifaController.getNumeros);
+router.get('/rifa/indexNumeros',[verifytoken],rifaController.indexNumeros);
 router.post('/rifa/assignNumbers/:id',[verifytoken],rifaController.assignNumbers);
 router.get('/rifa/getSeparated/:id',[verifytoken],rifaController.getSeparados);
 router.get('/rifa/confirmSeparated/:id',[verifytoken],rifaController.confirmarSeparados);
