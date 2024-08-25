@@ -56,7 +56,7 @@ exports.index = async (req, res) => {
           
        const index = await comprador.index(decodedToken?decodedToken.dominio:"numero1Dominio");
       
-       console.log(index)
+      // console.log(index)
        return res.json({mensaje:"Peticion aceptada con exito",compradores:index});
         
      }catch(e){
