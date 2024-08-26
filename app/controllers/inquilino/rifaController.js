@@ -472,19 +472,19 @@ exports.getNumeros = async (req, res) => {
 
   exports.forcedUpdateAssign = async (req, res) =>{
     const{decodedToken}= req;
-    const{rifa,comprador,status,number }=req.body;
+    const{rifa,comprador,status,numero }=req.body;
     
      if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
-     if(isNaN(rifa)|| isNaN(comprador) || isNaN(number) || status!=='separado'|'pagado'){
+     if(isNaN(rifa)|| isNaN(comprador) || isNaN(numero) || status!=='separado'|'pagado'){
       return res.json({error:'los campos no tienen el formato correspondiente'});
      }
      
      try {
 
-      const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa, number);
+      const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa, numero);
       if(!existingNumber){
-         const create = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,number,status,comprador);
+         const create = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,numero,status,comprador);
          return res.json({mensaje:'numero asignado correctamente',id:create.insertId});
       }else{
         if(existingNumber.status==='pagado'){
