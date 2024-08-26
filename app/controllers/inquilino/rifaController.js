@@ -310,7 +310,7 @@ exports.update = async (req, res) => {
    // updates.image = "";
   }
 
-  console.log(updates);
+ // console.log(updates);
 
 //return res.json(updates);
     // Manejar el campo premios por separado
@@ -390,7 +390,7 @@ exports.getNumeros = async (req, res) => {
 
    // return res.json(req.body);
     const{decodedToken,catchToken}= req;
-    const{numbers,id_comprador,method}=req.body;
+    const{numbers,id_comprador}=req.body;
     const { id } = req.params;
  
     
@@ -432,6 +432,7 @@ exports.getNumeros = async (req, res) => {
     
       const asignaciones = await Promise.all(numbers.map(async (number) => {
         const asignacion =  await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio", id, number, "separado", id_comprador);
+        console.log(asignacion);
         return asignacion;
       }));
 

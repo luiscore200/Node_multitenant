@@ -189,7 +189,7 @@ function assignNumbersValidator(data) {
         }
     }
     
-
+ /*
     // Validar pais
     if (method) {
         if(!method){
@@ -199,7 +199,7 @@ function assignNumbersValidator(data) {
             return { mensaje: 'El país debe ser una cadena de texto' };
         }
        
-    }
+    }*/
 
 
     return null;

@@ -42,7 +42,7 @@ const createTables = async (nombreInquilino) => {
         id_raffle INTEGER REFERENCES ${nombreInquilino}.raffle(id) ON DELETE CASCADE,
         number INTEGER,
         status VARCHAR(20) DEFAULT 'disponible' CHECK (status IN ('pagado', 'separado', 'ganador')),  -- Estado predeterminado: disponible
-        id_purchaser INTEGER REFERENCES ${nombreInquilino}.purchaser(id) ON DELETE SET NULL,
+        id_purchaser INTEGER REFERENCES ${nombreInquilino}.purchaser(id) ON DELETE CASCADE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
