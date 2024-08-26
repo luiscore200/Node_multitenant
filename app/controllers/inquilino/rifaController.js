@@ -470,6 +470,40 @@ exports.getNumeros = async (req, res) => {
 
  
 
+  exports.forcedUpdateAssign = async (req, res) =>{
+    const{decodedToken}= req;
+    const{rifa,comprador,status,number }=req.body;
+    
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+
+     if(isNaN(rifa)|| isNaN(comprador) || isNaN(number) || status!=='separado'|'pagado'){
+      return res.json({error:'los campos no tienen el formato correspondiente'});
+     }
+     
+     try {
+
+      const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa, number);
+      if(!existingNumber){
+         const create = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,number,status,comprador);
+         return res.json({mensaje:'numero asignado correctamente',id:create.insertId});
+      }else{
+        if(existingNumber.status==='pagado'){
+           return res.json({error:'no se ha modificado la asignacion'});
+        }else{
+          const update = await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",existingNumber.id,{id_purchaser:comprador,status:status});
+          if(update){
+           return res.json({mensaje:'numero asignado correctamente',id:existingNumber.id});
+          }else{
+           return res.json({error:'no se ha modificado la asignacion'});
+          }
+        }
+      }
+       
+     } catch (error) {
+      return res.json({error:'no se ha modificado la asignacion'});
+     }
+  }
+
 
       
   exports.eliminarSeparados = async (req, res) => {
@@ -479,7 +513,7 @@ exports.getNumeros = async (req, res) => {
     
     try {
 
-        const a= Asignaciones.findByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+        const a= await Asignaciones.findByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
         if(a.length===0){
             res.status(500).json({ error: 'Asignacion no encontrada' });
         }

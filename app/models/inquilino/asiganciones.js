@@ -149,7 +149,7 @@ class Assignament {
             const sql = `UPDATE ${propietario}.assignament SET ${fields.join(', ')} WHERE id = ?`;
 
             const [results] = await connection.execute(sql, values);
-            return results;
+            return results.affectedRows > 0;
         } catch (error) {
             throw error;
         }

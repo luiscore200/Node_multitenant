@@ -53,6 +53,7 @@ router.get('/rifa/confirmSeparated/:id',[verifytoken],rifaController.confirmarSe
 router.delete('/rifa/deleteSeparated/:id',[verifytoken],rifaController.eliminarSeparados);
 router.post('/rifa/confirmWinner/:id',[verifytoken],rifaController.actualizarGanador);
 router.get('/rifa/find/:id',[verifytoken],rifaController.rifaFind);
+router.post('/rifa/forcedUpdateAssign',[verifytoken],rifaController.forcedUpdateAssign);
 
 //comprador 
 router.post('/comprador/store',[verifytoken],compradorController.store);
