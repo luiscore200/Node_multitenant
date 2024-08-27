@@ -17,9 +17,10 @@ exports.store = async (req, res) => {
     const {name,email,phone,document}=req.body;
     const{decodedToken}= req;
     
-    //    if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+        if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
     try{
+        console.log(req.body);
         const find = await comprador.find(decodedToken? decodedToken.dominio:"numero1Dominio",'email',email);
         if(find!==null){return res.json({mensaje:"email en uso, comprador existe actualmente",comprador:find[0]})};
         
