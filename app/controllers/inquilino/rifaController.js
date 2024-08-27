@@ -484,14 +484,17 @@ exports.getNumeros = async (req, res) => {
 
       const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa, numero);
       if(existingNumber &&  existingNumber.status==='pagado'){
+        console.log('existe y pagado');
         return res.json({error:'no se ha modificado la asignacion'});
       }
 
     if(status==='separado'){
+      console.log(' no existe y separado');
       if(!existingNumber){
         const create = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,numero,status,comprador);
         return res.json({mensaje:'numero asignado correctamente',id:create.insertId});
      }else{
+      console.log('existe y separado');
          const update = await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",existingNumber.id,{id_purchaser:comprador,status:status});
          if(update){
           return res.json({mensaje:'numero asignado correctamente',id:existingNumber.id});
@@ -507,14 +510,17 @@ exports.getNumeros = async (req, res) => {
       
        
       if(!existingNumber){
+        console.log('no existe y local pagado');
         consulta = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,numero,status,comprador);
      }else{
+      console.log('existe y local pagado');
          consulta = await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",existingNumber.id,{id_purchaser:comprador,status:status});
      }
      if(consulta.insertId || consulta.affectedRows>0  ){
       let nuevo;
            consulta.insertId? nuevo=consulta.insertId : nuevo = existingNumber.id;
 
+           res.json({mensaje:'numero asignado correctamente',id:nuevo});  
 
            const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
            const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
