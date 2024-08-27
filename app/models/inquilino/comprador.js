@@ -44,9 +44,7 @@ class Purchaser {
                 `SELECT * FROM ${propietario}.purchaser WHERE ${key} = ?`,
                 [value]
             );
-            if (results.length === 0) {
-                throw new Error(`No se encontró ningún comprador con ${key} = ${value}`);
-            }
+         
             return results;
         } catch (error) {
            // throw error;

@@ -22,11 +22,11 @@ exports.store = async (req, res) => {
     try{
         console.log(req.body);
         const find = await comprador.find(decodedToken? decodedToken.dominio:"numero1Dominio",'email',email);
-        if(find!==null){return res.json({mensaje:"email en uso, comprador existe actualmente",comprador:find[0]})};
+        if(find.length>0){return res.json({mensaje:"email en uso, comprador existe actualmente",comprador:find[0]})};
         
         const response=  await comprador.store(decodedToken? decodedToken.dominio:"numero1Dominio",name,email,phone,document);
         const find2 = await comprador.find(decodedToken? decodedToken.dominio:"numero1Dominio",'id',response.insertId);
-        if(find2!==null){return res.json({mensaje:"comprador creado con exito",comprador:find2[0]})}
+        if(find2.length>0){return res.json({mensaje:"comprador creado con exito",comprador:find2[0]})}
         else{return res.json({error:"se ha producido un error al crear el usuario"})}
        
     }catch(e){
