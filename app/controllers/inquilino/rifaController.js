@@ -476,29 +476,96 @@ exports.getNumeros = async (req, res) => {
     
      if(!decodedToken){return res.json({error:"dominio no encontrado"});}
 
-     if(isNaN(rifa)|| isNaN(comprador) || isNaN(numero) || status!=='separado'|'pagado'){
+     if(isNaN(rifa)|| isNaN(comprador) || isNaN(numero) || (status!=='separado' && status!=='pagado')){
       return res.json({error:'los campos no tienen el formato correspondiente'});
      }
      
      try {
 
       const existingNumber = await Asignaciones.findNumberByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa, numero);
-      if(!existingNumber){
-         const create = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,numero,status,comprador);
-         return res.json({mensaje:'numero asignado correctamente',id:create.insertId});
-      }else{
-        if(existingNumber.status==='pagado'){
-           return res.json({error:'no se ha modificado la asignacion'});
-        }else{
-          const update = await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",existingNumber.id,{id_purchaser:comprador,status:status});
-          if(update){
-           return res.json({mensaje:'numero asignado correctamente',id:existingNumber.id});
-          }else{
-           return res.json({error:'no se ha modificado la asignacion'});
-          }
-        }
+      if(existingNumber &&  existingNumber.status==='pagado'){
+        return res.json({error:'no se ha modificado la asignacion'});
       }
+
+    if(status==='separado'){
+      if(!existingNumber){
+        const create = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,numero,status,comprador);
+        return res.json({mensaje:'numero asignado correctamente',id:create.insertId});
+     }else{
+         const update = await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",existingNumber.id,{id_purchaser:comprador,status:status});
+         if(update){
+          return res.json({mensaje:'numero asignado correctamente',id:existingNumber.id});
+         }else{
+          return res.json({error:'no se ha modificado la asignacion'});
+         }
        
+     }
+    }
+
+    if(status==='pagado'){
+       let consulta;
+      
+       
+      if(!existingNumber){
+        consulta = await Asignaciones.store(decodedToken ? decodedToken.dominio : "numero1Dominio",rifa,numero,status,comprador);
+     }else{
+         consulta = await Asignaciones.update(decodedToken ? decodedToken.dominio : "numero1Dominio",existingNumber.id,{id_purchaser:comprador,status:status});
+     }
+     if(consulta.insertId || consulta.affectedRows>0  ){
+      let nuevo;
+           consulta.insertId? nuevo=consulta.insertId : nuevo = existingNumber.id;
+
+
+           const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
+           const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
+           const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",rifa);
+
+           if(conf && sub!==null){
+
+            //////////////////
+                if(!sub.whatsapp && conf.phone_status){
+                  Inquilino.update(decodedToken.id,{phone_status:false})
+                }
+                if(!sub.email && conf.email_status){
+                  Inquilino.update(decodedToken.id,{email_status:false})
+                }
+            //////////////////////
+    
+                if(sub.email && conf.email_status && conf.email_verified){
+                  sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+                  sendMail2.sendAll();
+                 
+                }
+                if(!sub.email || !conf.email_status || !conf.email_verified){
+                  sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+                  sendMail.sendAll();
+                }
+    
+              
+                if( sub.whatsapp && conf.phone_status && conf.phone_verified){
+               
+                  whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a,rifa.prizes));
+                  whatsappService3.sendAll();
+                  
+                }
+               
+    
+          }else{
+            sendMail.addMessageToQueue(a.purchaser_email,`Confirmacion de compra `,rifaConfirmacionNumero(a,rifa.prizes));
+            sendMail.sendAll();
+           
+          }
+
+          return res.json({mensaje:'numero asignado correctamente',id:nuevo});   
+
+     }else{
+
+        return res.json({error:'no se ha modificado la asignacion'});
+     }
+
+
+
+    } 
      } catch (error) {
       return res.json({error:'no se ha modificado la asignacion'});
      }
