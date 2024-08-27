@@ -148,7 +148,7 @@ exports.store = async (req, res) => {
   console.log(req.body.titulo);
         
         const response=  await Rifa.store(decodedToken? decodedToken.dominio:"numero1Dominio",titulo, precio,pais,image? image:"",numeros,tipo,premios2);
-        return res.json({mensaje:"rifa creada con exito"});
+        return res.json({mensaje:"rifa creada con exito",id:response.insertId});
     }catch(e){
         deleteAllReqFiles(req);
         console.log(e.message);
