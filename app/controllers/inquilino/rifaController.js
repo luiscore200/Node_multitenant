@@ -582,7 +582,7 @@ exports.getNumeros = async (req, res) => {
 
         const a= await Asignaciones.findByRaffle(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
         if(a.length===0){
-            res.status(500).json({ error: 'Asignacion no encontrada' });
+          return res.status(500).json({ error: 'Asignacion no encontrada' });
         }
 
         await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
