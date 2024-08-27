@@ -521,12 +521,12 @@ exports.getNumeros = async (req, res) => {
            consulta.insertId? nuevo=consulta.insertId : nuevo = existingNumber.id;
 
            res.json({mensaje:'numero asignado correctamente',id:nuevo});  
-           
+
            (async () => {
             try {
                 const sub = await Suscripciones.find("sub_id", decodedToken.id_subscription);
                 const conf = await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
-                const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", rifa);
+                const rifa2 = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", rifa);
                 const a = await Asignaciones.findById(decodedToken ? decodedToken.dominio : "numero1Dominio", nuevo);
 
                 if (conf && sub !== null) {
@@ -538,19 +538,19 @@ exports.getNumeros = async (req, res) => {
                     }
 
                     if (sub.email && conf.email_status && conf.email_verified) {
-                        sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio", a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa.prizes));
+                        sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio", a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa2.prizes));
                         sendMail2.sendAll();
                     } else {
-                        sendMail.addMessageToQueue(a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa.prizes));
+                        sendMail.addMessageToQueue(a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa2.prizes));
                         sendMail.sendAll();
                     }
 
                     if (sub.whatsapp && conf.phone_status && conf.phone_verified) {
-                        whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio", a.purchaser_phone, rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a, rifa.prizes));
+                        whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio", a.purchaser_phone, rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a, rifa2.prizes));
                         whatsappService3.sendAll();
                     }
                 } else {
-                    sendMail.addMessageToQueue(a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa.prizes));
+                    sendMail.addMessageToQueue(a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa2.prizes));
                     sendMail.sendAll();
                 }
             } catch (error) {
