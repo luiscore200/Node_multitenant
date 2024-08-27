@@ -519,6 +519,8 @@ exports.getNumeros = async (req, res) => {
            const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
            const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
            const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio","id",rifa);
+           const a= await Asignaciones.findById(decodedToken ? decodedToken.dominio : "numero1Dominio",nuevo);
+           
 
            if(conf && sub!==null){
 
