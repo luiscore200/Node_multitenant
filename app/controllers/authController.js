@@ -116,7 +116,7 @@ exports.register = async (req, res) => {
 
      const finded = await User.find('id',created.insertId);
 
-      const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,payed:finded.payed,id_subscription:finded.id_subscription  };
+      const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed,id_subscription:finded.id_subscription  };
         const token = jwt.generateToken(payload, '24h');
         const mainDomain = process.env.MAIN_DOMAIN;
        // const domain2 = `${finded.domain}.${mainDomain}`;
@@ -126,7 +126,7 @@ exports.register = async (req, res) => {
     
      
     } catch (error) {
-    
+        console.log(error);
       res.status(500).send({error:error.message});
     }
   };
