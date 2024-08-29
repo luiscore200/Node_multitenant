@@ -108,7 +108,7 @@ exports.register = async (req, res) => {
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, true, false,"");
+     const created = await User.crear(name, domain, phone, email, country, password, "user", true, false,"");
      await createDatabase(domain);
      await fixDatabase(domain);
 
