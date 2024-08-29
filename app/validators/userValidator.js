@@ -1,5 +1,5 @@
 exports.validateCreateUser = (data) => {
-    const { name, email, password, phone, status, role,country, domain } = data;
+    const { name, email, password, phone, status,country, domain } = data;
 
     if (!name) {
         return { mensaje: 'Nombre requerido' };
@@ -68,11 +68,11 @@ exports.validateCreateUser = (data) => {
     if (status !== undefined && typeof status !== 'boolean') {
         return { mensaje: 'El estado debe ser un valor booleano' };
     }
-
+/*
     if (role !== undefined && typeof role !== 'string') {
         return { mensaje: 'El rol debe ser una cadena de texto' };
     }
-/*
+
     if (role && !validateRole(role)) {
         return { mensaje: 'El rol debe ser "user" o "admin"' };
     }*/

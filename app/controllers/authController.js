@@ -100,7 +100,7 @@ exports.register = async (req, res) => {
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
     }
    
-    const { name, phone, email, password, role, domain, country } = req.body;
+    const { name, phone, email, password, domain, country } = req.body;
       
     try {
       await User.crearTabla();
