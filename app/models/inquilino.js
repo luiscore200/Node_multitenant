@@ -36,7 +36,7 @@ class User {
     let localPayed;
     let localSuscripcion;
     try {
-      if(role && role=="admin"||role=="user"){
+      if(role && role==="admin"||role==="user"){
         localRole=role;
       }else{
         localRole="user";
@@ -48,7 +48,7 @@ class User {
         localPassword="password";
       }
 
-      if(status==true || status==false ){
+      if(status===true || status===false ){
         localStatus = status;
       }else{
         localStatus = true;
