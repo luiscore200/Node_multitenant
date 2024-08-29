@@ -65,7 +65,7 @@ class User {
       }
 
       const hashedPassword = await hashPassword(localPassword);
-      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed,id_suscription) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed,id_subscription) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)',
          [name, domain, phone, email, country, hashedPassword, localStatus, "user", localPayed,localSuscripcion]);
       return results;
     } catch (error) {
