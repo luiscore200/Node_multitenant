@@ -112,14 +112,14 @@ exports.register = async (req, res) => {
      await createDatabase(domain);
      await fixDatabase(domain);
 
-     await subdomains();
+    // await subdomains();
 
      const finded = await User.find('id',created.insertId);
 
       const payload = {  id: finded.id,name: finded.name,dominio: finded.domain,phone:finded.phone,email: finded.email,pais: finded.country,role: finded.role,payed:finded.payed,id_subscription:finded.id_subscription  };
         const token = jwt.generateToken(payload, '24h');
         const mainDomain = process.env.MAIN_DOMAIN;
-        const domain2 = `${finded.domain}.${mainDomain}`;
+       // const domain2 = `${finded.domain}.${mainDomain}`;
 
         // Enviar el token JWT y la información del usuario como respuesta
      return   res.json({ mensaje:"Registro completado exitosamente",access_token:token, user: payload,main_domain: domain2 });
