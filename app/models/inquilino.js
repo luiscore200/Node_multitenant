@@ -7,19 +7,19 @@ class User {
   static async crearTabla() {
     try {
       await connection.execute(`
-        CREATE TABLE IF NOT EXISTS  users (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          domain VARCHAR(255) NOT NULL UNIQUE,
-          phone VARCHAR(255 ) NOT NULL ,
-          email VARCHAR(255) NOT NULL UNIQUE,
-          country VARCHAR(255) NOT NULL,
-          password VARCHAR(255) NOT NULL,
-          status BOOLEAN NOT NULL  DEFAULT '0',
-          role VARCHAR(255) NOT NULL  DEFAULT 'user' CHECK (role IN ('user', 'admin')), 
-          payed BOOLEAN NOT NULL DEFAULT '0',
-          id_subscription VARCHAR(255) DEFAULT "";
-        )
+      CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  domain VARCHAR(255) NOT NULL UNIQUE,
+  phone VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  country VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  status BOOLEAN NOT NULL DEFAULT '0',
+  role VARCHAR(255) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+  payed BOOLEAN NOT NULL DEFAULT '0',
+  id_subscription VARCHAR(255) DEFAULT ""
+);
       `);
       console.log('Tabla  users creada o ya existente');
     } catch (error) {
