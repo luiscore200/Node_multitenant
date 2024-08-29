@@ -72,10 +72,10 @@ exports.validateCreateUser = (data) => {
     if (role !== undefined && typeof role !== 'string') {
         return { mensaje: 'El rol debe ser una cadena de texto' };
     }
-
+/*
     if (role && !validateRole(role)) {
         return { mensaje: 'El rol debe ser "user" o "admin"' };
-    }
+    }*/
 
     return null;
 };
