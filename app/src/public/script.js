@@ -2,8 +2,9 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
 
     const itemsPerPage=250;
     
-    const separados = asignaciones.filter(obj => obj.status==="separado").map(obj => obj.number);
-    const pagados = asignaciones.filter(obj => obj.status==="pagado").map(obj => obj.number);
+    const separados = asignaciones.filter(obj => obj.status === "separado").map(obj => Number(obj.number));
+const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => Number(obj.number));
+
     //const totalNums=Number(raffle.numbers);
     const totalNums=raffle.numbers;
     const price=raffle.price;
@@ -365,42 +366,36 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                 };
 
-               const renderCell = (number) => {
-                    const cell = document.createElement('div');
-                    cell.id='cell-'+number;
-                    if(pagados.includes(number)){
-                      cell.classList.add('assignedCell');
-                    }else   if(separados.includes(number)){
-                      cell.classList.add('reservedCell');
-                    } else{
-                     cell.classList.add('cell');
-                    }
-                   
+        const renderCell = (number) => {
+    // Crear el contenedor de la celda
+    const cell = document.createElement('div');
+    cell.id = 'cell-' + number;
 
-                    const textCell = document.createElement('p');
-                    textCell.classList.add('cellText')
-                    textCell.innerText = number;
+    // Determinar la clase según el estado
+    if (pagados.includes(number)) {
+        cell.classList.add('assignedCell');
+    } else if (separados.includes(number)) {
+        cell.classList.add('reservedCell');
+    } else {
+        cell.classList.add('cell');
 
-                    cell.appendChild(textCell);
+        // Añadir eventos solo si la celda no está pagada ni separada
+        cell.addEventListener('click', () => select(number));
+        cell.addEventListener('mouseenter', () => cell.classList.toggle('cell_hover', true));
+        cell.addEventListener('mouseleave', () => cell.classList.toggle('cell_hover', false));
+    }
 
-                    if (!pagados.includes(number) && !separados.includes(number)) {
-                        cell.addEventListener('click', () => select(number));
-                          cell.addEventListener('mouseenter', () => {
-                            cell.classList.remove('cell');
-                            cell.classList.add('cell_hover');
-                            });
-                        cell.addEventListener('mouseleave', () => {
-                            cell.classList.remove('cell_hover');
-                            cell.classList.add('cell');
-                            });
+    // Crear y agregar el texto de la celda
+    const textCell = document.createElement('p');
+    textCell.classList.add('cellText');
+    textCell.innerText = number;
+    cell.appendChild(textCell);
 
+    return cell;
+};
 
 
-                    }
-                        
-                    
-                    return cell;
-                };
+    
 
                 const renderMatrix = (startNumber) => {
                     const matrix = document.createElement('div');

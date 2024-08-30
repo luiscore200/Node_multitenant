@@ -215,7 +215,7 @@ exports.autogestion =async (req, res) => {
       await Asignaciones.eliminarAntiguasSeparadas(dominio? dominio:"numero1Dominio");
       
       const asignaciones = await Asignaciones.findByRaffle(dominio? dominio:"numero1Dominio",raffle);
-      console.log(asignaciones);
+    //  console.log(asignaciones);
 
       const rifa = await Rifa.find(dominio? dominio:"numero1Dominio","id",raffle);
 
@@ -226,14 +226,6 @@ exports.autogestion =async (req, res) => {
      
          
   
-        const  totalNumbers= 10000;
-        const price= 1000;
-        const totalNums = parseInt(totalNumbers, 10);
-
-        if (isNaN(totalNums)) {
-            return res.status(400).send('"totalNumbers" deben ser números.');
-        }
-
         // Lee el archivo HTML
         let html = fs.readFileSync(path.join(__dirname, '../src/public', 'index.html'), 'utf8');
         const script =script2.generateDynamicScript(token,  rifa,    asignaciones,    user?user:null);
