@@ -372,20 +372,20 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 };
 
         const renderCell = (number) => {
-          const nn= Number(number);
+          
             // Crear el contenedor de la celda
             const cell = document.createElement('div');
             cell.id = 'cell-' + number;
 
             // Determinar la clase según el estado
-            if (pagados.includes(nn)) {
+            if (pagados.includes(Number)) {
                 cell.classList.add('assignedCell');
-//                   cell.classList.add('cell');
+
             console.log('celda es asignada',number);
                 
-            } else if (separados.includes(nn)) {
-  //              cell.classList.add('reservedCell');
-                   cell.classList.add('cell');
+            } else if (separados.includes(Number)) {
+                cell.classList.add('reservedCell');
+ 
             } else {
                 cell.classList.add('cell');
 
