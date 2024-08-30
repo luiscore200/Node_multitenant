@@ -41,8 +41,11 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 const raffleID=${raffleID};
            
               
-                const pagados = '${pagados}';
-                const separados = '${separados}';
+                const pagadosStr = '${pagados}';
+              
+                const separadosStr = '${separados}';
+                const pagados = pagadosStr.split(',').map(Number);
+                  const separados = separadosStr.split(',').map(Number);
                 const itemsPerPage = ${itemsPerPage};
                 let selectedNumbers=[];
                 const totalPages = Math.ceil(totalNums / itemsPerPage);
