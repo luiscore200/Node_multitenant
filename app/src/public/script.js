@@ -401,7 +401,7 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
     
 
                 const renderMatrix = (startNumber) => {
-                  console.log(start, startNumber);
+                  console.log("start", startNumber);
                     const matrix = document.createElement('div');
                     matrix.classList.add('matrix');
            
