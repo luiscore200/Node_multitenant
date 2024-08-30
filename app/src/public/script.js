@@ -56,6 +56,8 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 console.log(userID);
                 console.log('pagados',pagados);
                 console.log('separados',separados);
+                console.log('Tipo de separados:', Array.isArray(separados)); // Debería ser true
+
         
 
             
