@@ -373,8 +373,8 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
 
             // Determinar la clase según el estado
             if (pagados.includes(number)) {
-//                cell.classList.add('assignedCell');
-                   cell.classList.add('cell');
+                cell.classList.add('assignedCell');
+//                   cell.classList.add('cell');
                 
             } else if (separados.includes(number)) {
   //              cell.classList.add('reservedCell');
