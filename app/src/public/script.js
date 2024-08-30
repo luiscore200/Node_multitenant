@@ -367,7 +367,7 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 };
 
         const renderCell = (number) => {
-          cosnt nn= Number(number);
+          const nn= Number(number);
             // Crear el contenedor de la celda
             const cell = document.createElement('div');
             cell.id = 'cell-' + number;
