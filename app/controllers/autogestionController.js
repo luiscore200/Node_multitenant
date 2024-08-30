@@ -215,7 +215,7 @@ exports.autogestion =async (req, res) => {
       await Asignaciones.eliminarAntiguasSeparadas(dominio? dominio:"numero1Dominio");
       
       const asignaciones = await Asignaciones.findByRaffle(dominio? dominio:"numero1Dominio",raffle);
- //     console.log(asignaciones);
+      console.log(asignaciones);
 
       const rifa = await Rifa.find(dominio? dominio:"numero1Dominio","id",raffle);
 

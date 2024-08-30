@@ -53,6 +53,8 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                 console.log(pagados);
                 let firstSection=true;
                 console.log(userID);
+                console.log('pagados',pagados);
+                console.log('separados',separados);
         
 
             
