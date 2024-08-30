@@ -56,10 +56,10 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 console.log(lista);
                // console.log(pagados);
                 let firstSection=true;
-                console.log(userID);
-                console.log('pagados',pagados);
-                console.log('separados',separados);
-                console.log('Tipo de separados:', Array.isArray(separados)); // Debería ser true
+            //    console.log(userID);
+             //   console.log('pagados',pagados);
+             //   console.log('separados',separados);
+//                console.log('Tipo de separados:', Array.isArray(separados)); // Debería ser true
 
         
 
@@ -381,7 +381,7 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
             if (pagados.includes(nn)) {
                 cell.classList.add('assignedCell');
 //                   cell.classList.add('cell');
-            console.log('celda es asignada',number);
+         //   console.log('celda es asignada',number);
                 
             } else if (separados.includes(nn)) {
                 cell.classList.add('reservedCell');
@@ -423,7 +423,7 @@ const renderMatrix = (startNumber) => {
         for (let j = 0; j < numCeldas; j++) {
             const number = startNumber + i * numCeldas + j;
             if (number <= totalNums) {
-                console.log("Rendering Cell Number:", number); // Verifica que los números de las celdas son correctos
+//                console.log("Rendering Cell Number:", number); // Verifica que los números de las celdas son correctos
                 row.appendChild(renderCell(number));
             }
         }
