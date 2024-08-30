@@ -375,13 +375,15 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
             if (pagados.includes(number)) {
                 cell.classList.add('assignedCell');
 //                   cell.classList.add('cell');
+            console.log('celda es asignada',number);
                 
             } else if (separados.includes(number)) {
   //              cell.classList.add('reservedCell');
                    cell.classList.add('cell');
+                       console.log('celda es separada',number);
             } else {
                 cell.classList.add('cell');
-
+    console.log('celda es disponible ',number);
                 // Añadir eventos solo si la celda no está pagada ni separada
                 cell.addEventListener('click', () => select(number));
                 cell.addEventListener('mouseenter', () => cell.classList.toggle('cell_hover', true));
