@@ -399,29 +399,33 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
 
 
     
+const renderMatrix = (startNumber) => {
+    console.log("Start Number:", startNumber); // Asegúrate de que el número inicial es correcto
 
-                const renderMatrix = (startNumber) => {
-                  console.log("start", startNumber);
-                    const matrix = document.createElement('div');
-                    matrix.classList.add('matrix');
-           
+    const matrix = document.createElement('div');
+    matrix.classList.add('matrix');
+    matrix.style.display = 'flex'; // Asegúrate de que el contenedor de la matriz tiene el estilo adecuado
+    matrix.style.flexDirection = 'column'; // Asegúrate de que la matriz se organiza en columnas
 
-                    for (let i = 0; i < numCeldas; i++) {
-                        const row = document.createElement('div');
-                        row.classList.add('row');
-                        row.style.display = 'flex'; // Ensure rows display as flex
-                        row.style.flexDirection = 'row'; // Display cells in row layout
+    for (let i = 0; i < numCeldas; i++) {
+        const row = document.createElement('div');
+        row.classList.add('row');
+        row.style.display = 'flex'; // Asegúrate de que las filas se muestran como flex
+        row.style.flexDirection = 'row'; // Asegúrate de que las celdas están en una fila
 
-                        for (let j = 0; j < numCeldas; j++) {
-                            const number = startNumber + i * numCeldas + j;
-                            if (number <= totalNums) {
-                                row.appendChild(renderCell(number));
-                            }
-                        }
-                        matrix.appendChild(row);
-                    }
-                    return matrix;
-                };
+        for (let j = 0; j < numCeldas; j++) {
+            const number = startNumber + i * numCeldas + j;
+            if (number <= totalNums) {
+                console.log("Rendering Cell Number:", number); // Verifica que los números de las celdas son correctos
+                row.appendChild(renderCell(number));
+            }
+        }
+        matrix.appendChild(row);
+    }
+    return matrix;
+};
+
+
                 const RenderListPaginations = () => {
                                 const list = document.createElement('div');
                                 list.id= "container-list";
