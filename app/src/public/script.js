@@ -384,8 +384,8 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
             console.log('celda es asignada',number);
                 
             } else if (separados.includes(nn)) {
-  //              cell.classList.add('reservedCell');
-                   cell.classList.add('cell');
+                cell.classList.add('reservedCell');
+  //                 cell.classList.add('cell');
             } else {
                 cell.classList.add('cell');
 
