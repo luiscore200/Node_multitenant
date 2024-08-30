@@ -57,7 +57,7 @@ exports.generateToken = async(req, res) => {
         const token = JWT.generateToken(payload, '24h');
 
        
-        urls.push(`http://${url}/${token}`);
+        urls.push(`https://${url}/${token}`);
 
        }    
      //  console.log(urls);
@@ -79,7 +79,7 @@ exports.generateToken = async(req, res) => {
             };
             const token = JWT.generateToken(payload, '24h');
             
-            const obj = `https://${url}/autogestion/${token}`;
+            const obj = `${url}/autogestion/${token}`;
             urls.push(obj);
             
             const comprador = compradores.find(element => element.id === users[index]);
@@ -96,7 +96,7 @@ exports.generateToken = async(req, res) => {
                   if(sub.whatsapp===true || conf.phone_status && conf.phone_verified){                
 
                     const tokenAcortado = await acortador.insertToken(obj);
-                    const urlAcortado = `https://${url}?st=${tokenAcortado}`;
+                    const urlAcortado = `${url}?st=${tokenAcortado}`;
                     whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",comprador.phone,plantillasWP.invitacionRifaWhatsApp(comprador,currentRifa,urlAcortado));               
                   }
               }else{
