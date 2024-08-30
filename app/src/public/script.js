@@ -53,7 +53,7 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 let listV = false;
                 let total =0;
                 let lista = ${JSON.stringify(Lista)};
-                console.log(lista);
+//                console.log(lista);
                // console.log(pagados);
                 let firstSection=true;
             //    console.log(userID);
@@ -407,7 +407,7 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
 
     
 const renderMatrix = (startNumber) => {
-    console.log("Start Number:", startNumber); // Asegúrate de que el número inicial es correcto
+  //  console.log("Start Number:", startNumber); // Asegúrate de que el número inicial es correcto
 
     const matrix = document.createElement('div');
     matrix.classList.add('matrix');
