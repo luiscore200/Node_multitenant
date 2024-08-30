@@ -5,7 +5,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
     const separados = asignaciones.filter(obj => obj.status==="separado").map(obj => obj.number);
     const pagados = asignaciones.filter(obj => obj.status==="pagado").map(obj => obj.number);
     //const totalNums=Number(raffle.numbers);
-    const totalNums=10000;
+    const totalNums=raffle.numbers;
     const price=raffle.price;
     const raffleID= raffle.id;
    
