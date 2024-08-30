@@ -24,9 +24,9 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
 
     const Lista = setLista();
   //  console.log(Lista);
-    console.log(token);
-    console.log(raffle);
-    console.log(userID);
+//    console.log(token);
+  //  console.log(raffle);
+  //  console.log(userID);
 
 
     const script = `
@@ -51,7 +51,7 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 let total =0;
                 let lista = ${JSON.stringify(Lista)};
                 console.log(lista);
-                console.log(pagados);
+               // console.log(pagados);
                 let firstSection=true;
                 console.log(userID);
                 console.log('pagados',pagados);
@@ -367,29 +367,32 @@ const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => N
                 };
 
         const renderCell = (number) => {
-    // Crear el contenedor de la celda
-    const cell = document.createElement('div');
-    cell.id = 'cell-' + number;
+            // Crear el contenedor de la celda
+            const cell = document.createElement('div');
+            cell.id = 'cell-' + number;
 
-    // Determinar la clase según el estado
-    if (pagados.includes(number)) {
-        cell.classList.add('assignedCell');
-    } else if (separados.includes(number)) {
-        cell.classList.add('reservedCell');
-    } else {
-        cell.classList.add('cell');
+            // Determinar la clase según el estado
+            if (pagados.includes(number)) {
+//                cell.classList.add('assignedCell');
+                   cell.classList.add('cell');
+                
+            } else if (separados.includes(number)) {
+  //              cell.classList.add('reservedCell');
+                   cell.classList.add('cell');
+            } else {
+                cell.classList.add('cell');
 
-        // Añadir eventos solo si la celda no está pagada ni separada
-        cell.addEventListener('click', () => select(number));
-        cell.addEventListener('mouseenter', () => cell.classList.toggle('cell_hover', true));
-        cell.addEventListener('mouseleave', () => cell.classList.toggle('cell_hover', false));
-    }
+                // Añadir eventos solo si la celda no está pagada ni separada
+                cell.addEventListener('click', () => select(number));
+                cell.addEventListener('mouseenter', () => cell.classList.toggle('cell_hover', true));
+                cell.addEventListener('mouseleave', () => cell.classList.toggle('cell_hover', false));
+            }
 
-    // Crear y agregar el texto de la celda
-    const textCell = document.createElement('p');
-    textCell.classList.add('cellText');
-    textCell.innerText = number;
-    cell.appendChild(textCell);
+            // Crear y agregar el texto de la celda
+            const textCell = document.createElement('p');
+            textCell.classList.add('cellText');
+            textCell.innerText = number;
+            cell.appendChild(textCell);
 
     return cell;
 };
