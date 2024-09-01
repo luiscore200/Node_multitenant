@@ -154,18 +154,8 @@ class Assignament {
             throw error;
         }
     }
-    static async findSeparatedWithPurchasers(propietario, id_raffle,estado) {
+    static async findSeparatedWithPurchasers(propietario, id_raffle) {
         try {
-
-            
-            let query;
-            if(estado && estado==='separado'){
-                query=`a.status = 'separado' AND`;
-            } if(estado && estado==='pagado'){
-                query=`a.status = 'pagado' AND`;
-            }  if(!estado ){
-                query=null;
-            }
             const [results] = await connection.execute(
                 `SELECT 
                     a.id,
@@ -177,7 +167,7 @@ class Assignament {
                     p.phone as purchaser_phone
                  FROM ${propietario}.assignament a
                  JOIN ${propietario}.purchaser p ON a.id_purchaser = p.id
-                 WHERE ${query!==null?query:""} AND a.id_raffle = ?`,
+                 WHERE a.status = 'separado' AND a.id_raffle = ?`,
                 [id_raffle]
             );
             return results;

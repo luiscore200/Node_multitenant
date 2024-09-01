@@ -458,24 +458,6 @@ exports.getNumeros = async (req, res) => {
     try {
         await Asignaciones.eliminarAntiguasSeparadas(decodedToken ? decodedToken.dominio : "numero1Dominio");
 
-        const asignaciones = await Asignaciones.findSeparatedWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id,"separado");
-
-      return  res.json(asignaciones);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener los números separados' });
-    }
-      
-  };
-
-  exports.getAllAssignament = async (req, res) => {
-    const{decodedToken}= req;
-    const { id } = req.params;
-     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
-    
-    try {
-        await Asignaciones.eliminarAntiguasSeparadas(decodedToken ? decodedToken.dominio : "numero1Dominio");
-
         const asignaciones = await Asignaciones.findSeparatedWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
 
       return  res.json(asignaciones);
@@ -486,9 +468,26 @@ exports.getNumeros = async (req, res) => {
       
   };
 
+  exports.getAllAssign = async (req, res) => {
+    const{decodedToken}= req;
+    const { id } = req.params;
+     if(!decodedToken){return res.json({error:"dominio no encontrado"});}
+    
+    try {
+        await Asignaciones.eliminarAntiguasSeparadas(decodedToken ? decodedToken.dominio : "numero1Dominio");
 
- 
+        const asignaciones = await Asignaciones.findAllWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
 
+      return  res.json(asignaciones);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener los números separados' });
+    }
+      
+  };
+
+
+  
 
  
 
