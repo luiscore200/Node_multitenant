@@ -49,6 +49,7 @@ router.get('/rifa/getNumeros/:id',[verifytoken],rifaController.getNumeros);
 router.get('/rifa/indexNumeros',[verifytoken],rifaController.indexNumeros);
 router.post('/rifa/assignNumbers/:id',[verifytoken],rifaController.assignNumbers);
 router.get('/rifa/getSeparated/:id',[verifytoken],rifaController.getSeparados);
+router.get('/rifa/getAllAssignament/:id',[verifytoken],rifaController.getAllAssignament);
 router.get('/rifa/confirmSeparated/:id',[verifytoken],rifaController.confirmarSeparados);
 router.delete('/rifa/deleteSeparated/:id',[verifytoken],rifaController.eliminarSeparados);
 router.post('/rifa/confirmWinner/:id',[verifytoken],rifaController.actualizarGanador);
