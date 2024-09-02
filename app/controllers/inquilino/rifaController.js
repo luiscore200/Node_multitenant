@@ -594,7 +594,7 @@ exports.getNumeros = async (req, res) => {
 
 
       
-  exports.eliminarSeparados = async (req, res) => {
+  exports.eliminarAsignacion = async (req, res) => {
     const{decodedToken}= req;
     const { id } = req.params;
      if(!decodedToken){return res.json({error:"dominio no encontrado"});}
