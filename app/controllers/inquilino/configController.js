@@ -64,7 +64,7 @@ exports.verifyConection= async(req,res)=>{
        // await whatsapp2.sendMessage("numero1Dominio", '+57 3177229993', 'Hola, este es un mensaje de prueba!');
 
     for (let index = 0; index < 24; index++) {
-         whatsapp2.addMessageToQueue(decodedToken.dominio,'+57 3216396330',"Hola, este es un mensaje de prueba");
+         whatsapp2.addMessageToQueue(decodedToken.dominio,'+57 3111111111',"Hola, este es un mensaje de prueba");
         
     }
     whatsapp2.sendAll();
