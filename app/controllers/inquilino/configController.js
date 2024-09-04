@@ -124,6 +124,7 @@ exports.saveConfig = async(req,res)=>{
 
     const { decodedToken } = req;
     const update = req.body
+    console.log(update);
 
     //return res.json(req.body);
 
