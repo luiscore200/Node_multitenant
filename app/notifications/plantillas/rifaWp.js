@@ -157,8 +157,8 @@ Haz clic en el siguiente enlace para obtener más información y participar:
 exports.asignacionEliminadaWhatsApp = (datos, rifa) => {
   let premiosTexto = '';
 
-  if (Array.isArray(rifa.premios) && rifa.premios.length > 0) {
-    premiosTexto = rifa.premios.map(premio => {
+  if (Array.isArray(rifa.prizes) && rifa.prizes.length > 0) {
+    premiosTexto = rifa.prizes.map(premio => {
       return `
         📌 *Descripción*: ${premio.descripcion}
         📅 *Lotería*: ${premio.loteria}
@@ -173,7 +173,7 @@ exports.asignacionEliminadaWhatsApp = (datos, rifa) => {
 
 Estimado/a *${datos.purchaser_name}*,
 
-Le informamos que su asignación número *${datos.number}* en la rifa *${rifa.nombre}* ha sido eliminada.
+Le informamos que su asignación número *${datos.number}* en la rifa *${rifa.tittle}* ha sido eliminada.
 
 Esta rifa cuenta con los siguientes premios:
 

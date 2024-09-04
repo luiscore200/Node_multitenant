@@ -498,8 +498,8 @@ exports.rifaRecordatorioPago = (asignacion, premios2) => {
 exports.asignacionEliminadaGmail = (datos, rifa) => {
   let premiosHTML = '';
 
-  if (Array.isArray(rifa.premios) && rifa.premios.length > 0) {
-    premiosHTML = rifa.premios.map(premio => {
+  if (Array.isArray(rifa.prizes) && rifa.prizes.length > 0) {
+    premiosHTML = rifa.prizes.map(premio => {
       return `
         <div class="premio">
           <p><span class="highlight">Descripción:</span> ${premio.descripcion}</p>
@@ -573,7 +573,7 @@ exports.asignacionEliminadaGmail = (datos, rifa) => {
         </div>
         <div class="content">
           <p>Estimado/a ${datos.purchaser_name},</p>
-          <p>Le informamos que su asignación número <span class="note">${datos.number}</span> en la rifa <span class="highlight">${rifa.nombre}</span> ha sido eliminada.</p>
+          <p>Le informamos que su asignación número <span class="note">${datos.number}</span> en la rifa <span class="highlight">${rifa.tittle}</span> ha sido eliminada.</p>
           <p>Esta rifa cuenta con los siguientes premios:</p>
           ${premiosHTML}
           <p>Este mensaje es automático. Si tiene alguna duda o consulta sobre esta situación, por favor, póngase en contacto con su proveedor.</p>
