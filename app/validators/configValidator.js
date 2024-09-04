@@ -14,7 +14,7 @@ exports.validateConfigUpdate = (data) => {
   
     // Validate phone_verified (optional but must be 0 or 1 if provided)
     if (phone_verified !== null) {
-      if (typeof phone_verified === "boolean") {
+      if (typeof phone_verified !== "boolean") {
       return {
         
          error: 'El valor de phone_verified debe ser un booleano',
@@ -24,7 +24,7 @@ exports.validateConfigUpdate = (data) => {
   
     // Validate phone_status (optional but must be 0 or 1 if provided)
     if (phone_status !== null) {
-      if (typeof phone_status === "boolean") {
+      if (typeof phone_status !== "boolean") {
         return {
        
          error: 'El valor de phone_status debe ser un booleano',
