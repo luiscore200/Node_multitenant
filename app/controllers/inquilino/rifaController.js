@@ -605,11 +605,11 @@ exports.getNumeros = async (req, res) => {
         const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
         const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
 
-        if(a.length===0){
+        if(a===null){
           return res.status(500).json({ error: 'Asignacion no encontrada' });
         }
 
-        if(a[0].status==='separado'){
+        if(a.status==='separado'){
           await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
           res.json({mensaje:"objeto eliminado con exito"});
         }else{
