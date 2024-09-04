@@ -870,11 +870,12 @@ exports.notificarPendientes = async (req, res) => {
     const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
       // Buscar la rifa por ID
       const a = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", id);
-       const premios = JSON.parse(a.premios);
+      
       if (!a) {
           return res.json({ error: "Rifa no encontrada" });
       }
-
+      console.log(a);
+      const premios = JSON.parse(a.premios);
       // Preparar los premios para la actualización
       
       // Actualizar la rifa con los nuevos premios
