@@ -484,10 +484,75 @@ exports.rifaRecordatorioPago = (asignacion, premios2) => {
          
           <p>Estos números serán válidos para la rifa de los siguientes premios:</p>
           ${premiosHTML}
-          <p class="note">Recuerda que si no realizas el pago, no podrás participar en la rifa ni reclamar premios.</p>
+          <p class="note">Recuerda que si no realizas el pago, no podrás participar en la rifa ni reclamar premios con los numeros correspondientes.</p>
         </div>
         <div class="footer">
           <p>Gracias por tu atención y te esperamos para que completes tu participación en nuestra rifa.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+
+exports.asignacionEliminadaGmail = (datos) => {
+  return `
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          color: #333;
+          line-height: 1.6;
+          padding: 20px;
+        }
+        .container {
+          max-width: 600px;
+          margin: auto;
+          background: #fff;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+          text-align: center;
+          padding: 10px 0;
+        }
+        .header h1 {
+          color: #FF5722;
+        }
+        .content {
+          text-align: center;
+        }
+        .content p {
+          font-size: 16px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 14px;
+          color: #777;
+        }
+        .note {
+          color: #FF5722;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Notificación de Eliminación</h1>
+        </div>
+        <div class="content">
+          <p>Estimado/a ${datos.purchaser_name},</p>
+          <p>Le informamos que su asignación número <span class="note">${datos.number}</span> ha sido eliminada.</p>
+          <p>Este mensaje es automático. Si tiene alguna duda o consulta sobre esta situación, por favor, póngase en contacto con su proveedor.</p>
+        </div>
+        <div class="footer">
+          <p>Gracias por su comprensión.</p>
         </div>
       </div>
     </body>

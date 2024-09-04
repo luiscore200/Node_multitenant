@@ -3,7 +3,7 @@ const {validateUpdateRifa,validateCreateRifa, assignNumbersValidator} = require(
 const Asignaciones = require('../../models/inquilino/asiganciones');
 const sendMail = require('../../notifications/mailerService');
 const sendMail2 = require('../../notifications/mailerService2');
-const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero, rifaRecordatorioPago} = require('../../notifications/plantillas/rifaMails');
+const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero, rifaRecordatorioPago, asignacionEliminadaGmail} = require('../../notifications/plantillas/rifaMails');
 const rifaPlantillasWp = require('../../notifications/plantillas/rifaWp');
 const whatsappService3 = require('../../notifications/whatsappService3');
 const whatsappService2 = require('../../notifications/whatsappService2');
@@ -602,15 +602,71 @@ exports.getNumeros = async (req, res) => {
     try {
 
         const a= await Asignaciones.findById(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+        const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
+        const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
+
         if(a.length===0){
           return res.status(500).json({ error: 'Asignacion no encontrada' });
         }
 
-        await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+        if(a[0].status==='separado'){
+          await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+          res.json({mensaje:"objeto eliminado con exito"});
+        }else{
+
+          await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
+          res.json({mensaje:"objeto eliminado con exito"});
+
+          (async()=>{
+            try {
+              if(conf && sub!==null){
+
+                //////////////////
+                    if(!sub.whatsapp && conf.phone_status){
+                      Inquilino.update(decodedToken.id,{phone_status:false})
+                    }
+                    if(!sub.email && conf.email_status){
+                      Inquilino.update(decodedToken.id,{email_status:false})
+                    }
+                //////////////////////
+        
+                    if(sub.email && conf.email_status && conf.email_verified){
+                      sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a));
+                      sendMail2.sendAll();
+                     
+                    }
+                    if(!sub.email || !conf.email_status || !conf.email_verified){
+                      sendMail.addMessageToQueue(a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a));
+                      sendMail.sendAll();
+                    }
+        
+                  
+                    if( sub.whatsapp && conf.phone_status && conf.phone_verified){
+                   
+                      whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.asignacionEliminadaWhatsApp(a));
+                      whatsappService3.sendAll();
+                      
+                    }
+                   
+        
+              }else{
+                sendMail.addMessageToQueue(a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a));
+                sendMail.sendAll();
+               
+              }
+             
+            } catch (error) {
+              
+            }
+          })();
+
+        }
+
+  
 
         
 
-       return res.json({mensaje:"objeto eliminado con exito"});
+       res.json({mensaje:"objeto eliminado con exito"});
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al eliminar la asignacion' });

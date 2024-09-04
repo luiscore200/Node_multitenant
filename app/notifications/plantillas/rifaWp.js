@@ -118,7 +118,7 @@ Gracias por participar en nuestra rifa y ¡buena suerte!
   
   ${premiosTexto}
   
-  ⚠️ *Recuerda*: Si no realizas el pago, no podrás participar en la rifa ni reclamar premios.
+  ⚠️ *Recuerda*: Si no realizas el pago, no podrás participar en la rifa ni reclamar premios con los numeros correspondientes.
   
   Gracias por tu atención, esperamos que completes tu participación pronto.
   `;
@@ -151,4 +151,19 @@ Haz clic en el siguiente enlace para obtener más información y participar:
 
 ¡No pierdas esta oportunidad de ganar increíbles premios!
 `;
+};
+
+
+exports.asignacionEliminadaWhatsApp = (datos) => {
+  return `
+*Notificación de Eliminación*
+
+Estimado/a *${datos.purchaser_name}*,
+
+Le informamos que su asignación número *${datos.number}* ha sido eliminada.
+
+Este mensaje es automático. Si tiene alguna duda o consulta sobre esta situación, por favor, póngase en contacto con su proveedor.
+
+Gracias por su comprensión.
+  `;
 };
