@@ -400,3 +400,97 @@ exports.rifaInvitacion = (comprador, currentRifa, url) => {
 </body>
 </html>`;
 };
+
+
+exports.rifaRecordatorioPago = (asignacion, premios2) => {
+  let premiosHTML = '';
+  const premios = premios2;
+
+  if (Array.isArray(premios)) {
+    premiosHTML = premios.map(premio => {
+      return `
+        <div class="premio">
+          <p><span class="highlight">Descripción:</span> ${premio.descripcion}</p>
+          <p><span class="highlight">Lotería:</span> ${premio.loteria}</p>
+          <p><span class="highlight">Fecha:</span> ${premio.fecha}</p>
+        </div>`;
+    }).join('');
+  } else {
+    premiosHTML = '<p>No se encontraron premios válidos.</p>';
+  }
+  
+  return `
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          color: #333;
+          line-height: 1.6;
+          padding: 20px;
+        }
+        .container {
+          max-width: 600px;
+          margin: auto;
+          background: #fff;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+          text-align: center;
+          padding: 10px 0;
+        }
+        .header h1 {
+          color: #FF7043;
+        }
+        .content {
+          text-align: center;
+        }
+        .content p {
+          font-size: 16px;
+        }
+        .highlight {
+          color: #FF7043;
+          font-weight: bold;
+        }
+        .premio {
+          border: 1px solid #ddd;
+          padding: 10px;
+          margin: 10px 0;
+          background-color: #f9f9f9;
+          border-radius: 5px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 14px;
+          color: #777;
+        }
+        .note {
+          color: #FFA726;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>¡Recordatorio de Pago, ${asignacion.purchaser_name}!</h1>
+        </div>
+        <div class="content">
+          <p>Te recordamos que tienes números pendientes de pago. Para hacer válida tu participación en la rifa, por favor cancela el valor de los numeros pendientes.</p>
+         
+          <p>Estos números serán válidos para la rifa de los siguientes premios:</p>
+          ${premiosHTML}
+          <p class="note">Recuerda que si no realizas el pago, no podrás participar en la rifa ni reclamar premios.</p>
+        </div>
+        <div class="footer">
+          <p>Gracias por tu atención y te esperamos para que completes tu participación en nuestra rifa.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};

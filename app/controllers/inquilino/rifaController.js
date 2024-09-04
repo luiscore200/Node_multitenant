@@ -3,7 +3,7 @@ const {validateUpdateRifa,validateCreateRifa, assignNumbersValidator} = require(
 const Asignaciones = require('../../models/inquilino/asiganciones');
 const sendMail = require('../../notifications/mailerService');
 const sendMail2 = require('../../notifications/mailerService2');
-const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero} = require('../../notifications/plantillas/rifaMails');
+const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero, rifaRecordatorioPago} = require('../../notifications/plantillas/rifaMails');
 const rifaPlantillasWp = require('../../notifications/plantillas/rifaWp');
 const whatsappService3 = require('../../notifications/whatsappService3');
 const whatsappService2 = require('../../notifications/whatsappService2');
@@ -854,6 +854,103 @@ exports.getNumeros = async (req, res) => {
         return res.status(500).json({ error: "Error al actualizar el ganador" });
     }
 };
+
+
+
+exports.notificarPendientes = async (req, res) => {
+  const { id } = req.params;
+  const update = req.body.premios;
+  const index = req.body.index;
+  const { decodedToken } = req;
+
+  if(!decodedToken){return res.json({error:"Dominio no encontrado"});}
+
+  try {
+    const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
+    const sub = await Suscripciones.find("sub_id",decodedToken.id_subscription);
+      // Buscar la rifa por ID
+      const a = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", id);
+       const premios = JSON.parse(a.premios);
+      if (!a) {
+          return res.json({ error: "Rifa no encontrada" });
+      }
+
+      // Preparar los premios para la actualización
+      
+      // Actualizar la rifa con los nuevos premios
+     
+
+      // Buscar el ganador del número de la rifa
+      
+      // Agrupar las asignaciones por correo electrónico del comprador
+      const all = await Asignaciones.findAllWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
+      const agrupados = agruparPorUsuario(all);
+
+   
+
+    
+      for (const email in agrupados) {
+          const elementos = agrupados[email];
+          console.log(elementos);
+          const separado = elementos.find(element => element.status === 'separado');
+          
+       
+         if(separado) {
+
+            const obj = elementos[0];
+
+            if(conf && sub!==null){
+
+              //////////////////
+              if(!sub.whatsapp && conf.phone_status){
+                Inquilino.update(decodedToken.id,{phone_status:false})
+              }
+              if(!sub.email && conf.email_status){
+                Inquilino.update(decodedToken.id,{email_status:false})
+              }
+          //////////////////////
+
+
+              if(sub.email && conf.email_status && conf.email_verified){
+                sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",email,"¡Notificacion de pago!",rifaRecordatorioPago(obj,premios));
+                sendMail2.sendAll();
+              }
+              if(!sub.email || !conf.email_status|| !conf.email_verified){
+                sendMail.addMessageToQueue(email,"¡Notificacion de pago!",rifaRecordatorioPago(obj,premios));
+                sendMail.sendAll();
+              }
+              
+              if(sub.whatsapp && conf.phone_status && conf.phone_verified){
+                whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",obj.purchaser_phone,
+                  rifaPlantillasWp.rifaRecordatorioPagoWhatsApp(obj,premios))
+                whatsappService2.sendAll();
+              }
+        
+              }else{
+                sendMail.addMessageToQueue(email,"Tu notificacion de juego",rifaNotificacionPendiente());
+                sendMail.sendAll();
+        
+              }
+     
+            
+           
+
+          }
+      }
+
+      return res.json({ mensaje: "Ganador asignado con éxito" });
+
+  } catch (e) {
+      console.log(e.message);
+      return res.status(500).json({ error: "Error al actualizar el ganador" });
+  }
+};
+
+
+
+
+
+
 
 // Función para agrupar asignaciones por correo electrónico del comprador
 const agruparPorUsuario = (items) => {
