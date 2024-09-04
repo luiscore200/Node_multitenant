@@ -886,10 +886,13 @@ exports.notificarPendientes = async (req, res) => {
       const all = await Asignaciones.findAllWithPurchasers(decodedToken ? decodedToken.dominio : "numero1Dominio", id);
       const agrupados = agruparPorUsuario(all);
 
-   
+      res.json({mensaje:'notificaciones enviadas con exito'});  
 
     
-      for (const email in agrupados) {
+    (async ()=>{
+      try {
+        
+        for (const email in agrupados) {
           const elementos = agrupados[email];
           console.log(elementos);
           const separado = elementos.find(element => element.status === 'separado');
@@ -938,7 +941,12 @@ exports.notificarPendientes = async (req, res) => {
           }
       }
 
-      return res.json({ mensaje: "Ganador asignado con éxito" });
+      } catch (error) {
+        
+      }
+    })();
+
+      
 
   } catch (e) {
       console.log(e.message);
