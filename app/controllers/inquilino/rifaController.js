@@ -624,7 +624,7 @@ exports.getNumeros = async (req, res) => {
               if(conf && sub!==null){
 
                 const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", a.id_raffle);
-
+                console.log('esta es la rifa',rifa);
                 //////////////////
                     if(!sub.whatsapp && conf.phone_status){
                       Inquilino.update(decodedToken.id,{phone_status:false})
