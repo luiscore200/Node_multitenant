@@ -1,6 +1,7 @@
 const Email = require('../../notifications/mailerService');
 const whatsapp = require('../../notifications/whatsappService3');
 const whatsapp2 = require('../../notifications/whatsappService2');
+const whatsapp4 = require('../../notifications/whatsappService4');
 const qrcode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
@@ -31,8 +32,11 @@ exports.sendQr = async (req, res) => {
       //  await whatsapp.borrarQr(dominio);
        // const qrString = await whatsapp.crearQr(dominio); // Suponiendo que crearQr devuelve el QR como string
 
-       await whatsapp2.clearSession(dominio);
-       const qrString =await whatsapp2.crearSession(dominio);
+      // await whatsapp2.clearSession(dominio);
+       //const qrString =await whatsapp2.crearSession(dominio);
+
+       await whatsapp4.clearSession(dominio);
+       const qrString =await whatsapp4.sessionManager(dominio,true);
      
         await qrcode.toFile(qrPath, qrString, { type: 'png' });
 
@@ -64,10 +68,11 @@ exports.verifyConection= async(req,res)=>{
        // await whatsapp2.sendMessage("numero1Dominio", '+57 3177229993', 'Hola, este es un mensaje de prueba!');
 
     for (let index = 0; index < 24; index++) {
-         whatsapp2.addMessageToQueue(decodedToken.dominio,'+57 3219876540',"Hola, este es un mensaje de prueba");
-        
+        // whatsapp2.addMessageToQueue(decodedToken.dominio,'+57 3219876540',"Hola, este es un mensaje de prueba");
+         whatsapp4.addMessageToQueue(decodedToken.dominio,'+57 3219876540',"Hola, este es un mensaje de prueba");
     }
-    whatsapp2.sendAll();
+  //  whatsapp2.sendAll();
+        whatsapp4.sendAll();
 
        // await whatsapp.sendMessage(decodedToken?decodedToken.dominio:"numero1Dominio","333311232323","¡Hola este es un mensaje de prueba!")
             return res.json({mensaje:"confirmacion completada"});

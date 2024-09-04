@@ -68,7 +68,7 @@ const verificarSesionActiva = async (sessionId) => {
 };
 
 
-const getSessionPath = (sessionId)=>{return path.join(__dirname, `./sessions2/${sessionId}`) }
+const getSessionPath = (sessionId)=>{return path.join(__dirname, `./sessions3/${sessionId}`) }
 
 
 
