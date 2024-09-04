@@ -54,7 +54,7 @@ exports.validateConfigUpdate = (data) => {
   
     // Validate email_status (optional but must be 0 or 1 if provided)
     if (email_status !== null) {
-      if (typeof email_status === "boolean") {
+      if (typeof email_status !== "boolean") {
         return {
          
          error: 'El valor de email_status debe ser un booleano',
@@ -64,7 +64,7 @@ exports.validateConfigUpdate = (data) => {
   
     // Validate email_verified (optional but must be 0 or 1 if provided)
     if (email_verified !== null) {
-      if (typeof email_verified === "boolean") {
+      if (typeof email_verified !== "boolean") {
      
         return {
          error: 'El valor de email_verified debe ser un booleano',
