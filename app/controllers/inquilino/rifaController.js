@@ -875,7 +875,7 @@ exports.notificarPendientes = async (req, res) => {
           return res.json({ error: "Rifa no encontrada" });
       }
       console.log(a);
-      const premios = JSON.parse(a.premios);
+      const premios = JSON.parse(a.prizes);
       // Preparar los premios para la actualización
       
       // Actualizar la rifa con los nuevos premios
