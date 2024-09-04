@@ -666,7 +666,7 @@ exports.getNumeros = async (req, res) => {
 
         
 
-       res.json({mensaje:"objeto eliminado con exito"});
+      
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al eliminar la asignacion' });
