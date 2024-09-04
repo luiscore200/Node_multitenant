@@ -5,7 +5,6 @@ const sendMail = require('../../notifications/mailerService');
 const sendMail2 = require('../../notifications/mailerService2');
 const {rifaGanador,rifaGanadorDeudor,rifaNoGanador,rifaConfirmacionNumero, rifaRecordatorioPago, asignacionEliminadaGmail} = require('../../notifications/plantillas/rifaMails');
 const rifaPlantillasWp = require('../../notifications/plantillas/rifaWp');
-const whatsappService3 = require('../../notifications/whatsappService3');
 const whatsappService2 = require('../../notifications/whatsappService2');
 const Config = require('../../models/inquilino/config');
 const AdminConfig = require('../../models/config');
@@ -567,8 +566,8 @@ exports.getNumeros = async (req, res) => {
                     }
 
                     if (sub.whatsapp && conf.phone_status && conf.phone_verified) {
-                        whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio", a.purchaser_phone, rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a, rifa2.prizes));
-                        whatsappService3.sendAll();
+                        whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio", a.purchaser_phone, rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a, rifa2.prizes));
+                        whatsappService2.sendAll();
                     }
                 } else {
                     sendMail.addMessageToQueue(a.purchaser_email, `Confirmacion de compra`, rifaConfirmacionNumero(a, rifa2.prizes));
@@ -647,8 +646,8 @@ exports.getNumeros = async (req, res) => {
                   
                     if( sub.whatsapp && conf.phone_status && conf.phone_verified){
                    
-                      whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.asignacionEliminadaWhatsApp(a,rifa));
-                      whatsappService3.sendAll();
+                      whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.asignacionEliminadaWhatsApp(a,rifa));
+                      whatsappService2.sendAll();
                       
                     }
                    
@@ -725,8 +724,8 @@ exports.getNumeros = async (req, res) => {
           
             if( sub.whatsapp && conf.phone_status && conf.phone_verified){
            
-              whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a,rifa.prizes));
-              whatsappService3.sendAll();
+              whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.rifaConfirmacionNumeroWhatsApp(a,rifa.prizes));
+              whatsappService2.sendAll();
               
             }
            
