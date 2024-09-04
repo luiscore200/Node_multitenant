@@ -154,13 +154,30 @@ Haz clic en el siguiente enlace para obtener más información y participar:
 };
 
 
-exports.asignacionEliminadaWhatsApp = (datos) => {
+exports.asignacionEliminadaWhatsApp = (datos, rifa) => {
+  let premiosTexto = '';
+
+  if (Array.isArray(rifa.premios) && rifa.premios.length > 0) {
+    premiosTexto = rifa.premios.map(premio => {
+      return `
+        📌 *Descripción*: ${premio.descripcion}
+        📅 *Lotería*: ${premio.loteria}
+        📅 *Fecha*: ${premio.fecha}`;
+    }).join('\n');
+  } else {
+    premiosTexto = 'No se encontraron premios válidos para esta rifa.';
+  }
+
   return `
 *Notificación de Eliminación*
 
 Estimado/a *${datos.purchaser_name}*,
 
-Le informamos que su asignación número *${datos.number}* ha sido eliminada.
+Le informamos que su asignación número *${datos.number}* en la rifa *${rifa.nombre}* ha sido eliminada.
+
+Esta rifa cuenta con los siguientes premios:
+
+${premiosTexto}
 
 Este mensaje es automático. Si tiene alguna duda o consulta sobre esta situación, por favor, póngase en contacto con su proveedor.
 

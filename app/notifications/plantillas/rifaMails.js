@@ -495,8 +495,22 @@ exports.rifaRecordatorioPago = (asignacion, premios2) => {
   `;
 };
 
+exports.asignacionEliminadaGmail = (datos, rifa) => {
+  let premiosHTML = '';
 
-exports.asignacionEliminadaGmail = (datos) => {
+  if (Array.isArray(rifa.premios) && rifa.premios.length > 0) {
+    premiosHTML = rifa.premios.map(premio => {
+      return `
+        <div class="premio">
+          <p><span class="highlight">Descripción:</span> ${premio.descripcion}</p>
+          <p><span class="highlight">Lotería:</span> ${premio.loteria}</p>
+          <p><span class="highlight">Fecha:</span> ${premio.fecha}</p>
+        </div>`;
+    }).join('');
+  } else {
+    premiosHTML = '<p>No se encontraron premios válidos para esta rifa.</p>';
+  }
+
   return `
     <html>
     <head>
@@ -529,6 +543,17 @@ exports.asignacionEliminadaGmail = (datos) => {
         .content p {
           font-size: 16px;
         }
+        .highlight {
+          color: #FF5722;
+          font-weight: bold;
+        }
+        .premio {
+          border: 1px solid #ddd;
+          padding: 10px;
+          margin: 10px 0;
+          background-color: #f9f9f9;
+          border-radius: 5px;
+        }
         .footer {
           text-align: center;
           margin-top: 20px;
@@ -548,7 +573,9 @@ exports.asignacionEliminadaGmail = (datos) => {
         </div>
         <div class="content">
           <p>Estimado/a ${datos.purchaser_name},</p>
-          <p>Le informamos que su asignación número <span class="note">${datos.number}</span> ha sido eliminada.</p>
+          <p>Le informamos que su asignación número <span class="note">${datos.number}</span> en la rifa <span class="highlight">${rifa.nombre}</span> ha sido eliminada.</p>
+          <p>Esta rifa cuenta con los siguientes premios:</p>
+          ${premiosHTML}
           <p>Este mensaje es automático. Si tiene alguna duda o consulta sobre esta situación, por favor, póngase en contacto con su proveedor.</p>
         </div>
         <div class="footer">

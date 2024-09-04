@@ -609,6 +609,8 @@ exports.getNumeros = async (req, res) => {
           return res.status(500).json({ error: 'Asignacion no encontrada' });
         }
 
+      
+
         if(a.status==='separado'){
           await Asignaciones.eliminar(decodedToken ? decodedToken.dominio : "numero1Dominio",id);
           res.json({mensaje:"objeto eliminado con exito"});
@@ -621,6 +623,8 @@ exports.getNumeros = async (req, res) => {
             try {
               if(conf && sub!==null){
 
+                const rifa = await Rifa.find(decodedToken ? decodedToken.dominio : "numero1Dominio", "id", a.id_raffle);
+
                 //////////////////
                     if(!sub.whatsapp && conf.phone_status){
                       Inquilino.update(decodedToken.id,{phone_status:false})
@@ -631,26 +635,26 @@ exports.getNumeros = async (req, res) => {
                 //////////////////////
         
                     if(sub.email && conf.email_status && conf.email_verified){
-                      sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a));
+                      sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a,rifa));
                       sendMail2.sendAll();
                      
                     }
                     if(!sub.email || !conf.email_status || !conf.email_verified){
-                      sendMail.addMessageToQueue(a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a));
+                      sendMail.addMessageToQueue(a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a,rifa));
                       sendMail.sendAll();
                     }
         
                   
                     if( sub.whatsapp && conf.phone_status && conf.phone_verified){
                    
-                      whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.asignacionEliminadaWhatsApp(a));
+                      whatsappService3.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",a.purchaser_phone,rifaPlantillasWp.asignacionEliminadaWhatsApp(a,rifa));
                       whatsappService3.sendAll();
                       
                     }
                    
         
               }else{
-                sendMail.addMessageToQueue(a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a));
+                sendMail.addMessageToQueue(a.purchaser_email,`Notificacion de juego `,asignacionEliminadaGmail(a,rifa));
                 sendMail.sendAll();
                
               }
