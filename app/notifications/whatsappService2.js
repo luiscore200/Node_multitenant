@@ -327,7 +327,7 @@ exports.sendAll = async () => {
         try {
 
             const sock = sessions[sessionId];
-            const contacts = Object.values(sock.store.contacts);
+            const contacts =await sock.fetchContacts();
             console.log('estos son los contactos',contacts);
             
         
