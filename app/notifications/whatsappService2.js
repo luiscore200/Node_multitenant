@@ -111,7 +111,9 @@ const moverMensajesASesionPendiente = (sessionId) => {
                  //   console.log("code",code);
                  console.log(update.qr);
             
-                 resolve(update.qr)
+                 resolve(update.qr);
+
+                 
               
             
                  }else if (update.connection === 'close') {
@@ -196,13 +198,15 @@ const moverMensajesASesionPendiente = (sessionId) => {
         try {
             await verificarConexionInternet();
             if (!await verificarSesionActiva(sessionId)) {throw 'Sesión no existe'; }
+            
     
-            const sock = await init(sessionId); 
+            const sock = await init(sessionId);
+            const aa = await exports.getContacts(sessionId);
             console.log("sock",sock);
             const numberClean = formatPhone(number);
             const jid = `${numberClean}@s.whatsapp.net`;
 
-            await sendMessageWithTimeout(sock,jid,message);
+            await sendMessageWithTimeout(sock,jid,aa);
         
 
         } catch (error) {
@@ -285,6 +289,7 @@ exports.sendAll = async () => {
     });
 };
 
+
     
 
     exports.clearSession = async(sessionId)=> {
@@ -313,6 +318,12 @@ exports.sendAll = async () => {
 
     exports.getContacts = async (sessionId) => {
         try {
+
+            const sock = sessions[sessionId];
+            const contacts = Object.values(sock.store.contacts);
+            console.log('estos son los contactos',contacts);
+            return contacts;
+            
         
        
         } catch (error) {
