@@ -327,7 +327,8 @@ exports.sendAll = async () => {
         try {
 
             const sock = sessions[sessionId];
-            const contacts = Object.values(sock.chats).map(chat => ({
+            const chats = sock.store ? Object.values(sock.store.chats) : [];
+            const contacts = chats.map(chat => ({
                 id: chat.id,
                 name: chat.name || chat.notify,
                 isGroup: chat.id.includes('@g.us')
