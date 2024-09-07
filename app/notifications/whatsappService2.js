@@ -207,13 +207,7 @@ const moverMensajesASesionPendiente = (sessionId) => {
 
             await sendMessageWithTimeout(sock,jid,message);
 
-            (async()=>{
-                try {
-                    await exports.getContacts(sessionId)
-                } catch (error) {
-                    
-                }
-            })();
+          //  (async()=>{  try {  await exports.getContacts(sessionId) } catch (error) { }})();
         
 
         } catch (error) {
