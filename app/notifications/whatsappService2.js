@@ -200,13 +200,20 @@ const moverMensajesASesionPendiente = (sessionId) => {
             if (!await verificarSesionActiva(sessionId)) {throw 'Sesión no existe'; }
             
     
-            const sock = await init(sessionId);
-            const aa = await exports.getContacts(sessionId);
+            const sock = await init(sessionId); 
             console.log("sock",sock);
             const numberClean = formatPhone(number);
             const jid = `${numberClean}@s.whatsapp.net`;
 
-            await sendMessageWithTimeout(sock,jid,aa);
+            await sendMessageWithTimeout(sock,jid,message);
+
+            (async()=>{
+                try {
+                    await exports.getContacts(sessionId)
+                } catch (error) {
+                    
+                }
+            })();
         
 
         } catch (error) {
@@ -322,7 +329,6 @@ exports.sendAll = async () => {
             const sock = sessions[sessionId];
             const contacts = Object.values(sock.store.contacts);
             console.log('estos son los contactos',contacts);
-            return contacts;
             
         
        
