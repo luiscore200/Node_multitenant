@@ -327,7 +327,12 @@ exports.sendAll = async () => {
         try {
 
             const sock = sessions[sessionId];
-            const contacts =await sock.fetchContacts();
+            const contacts = Object.values(sock.chats).map(chat => ({
+                id: chat.id,
+                name: chat.name || chat.notify,
+                isGroup: chat.id.includes('@g.us')
+            }));
+            
             console.log('estos son los contactos',contacts);
             
         
