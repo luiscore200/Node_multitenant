@@ -8,6 +8,7 @@ exports.onlyAdmin = (req, res, next) => {
 
 exports.onlyUser = (req, res, next) => {
     
+    
     // Verificar si el usuario tiene el rol de usuario
     if (req.decodedToken.role !== 'user') {
         return res.status(403).json({ mensaje: 'No tienes permiso para acceder a esta ruta como usuario' });

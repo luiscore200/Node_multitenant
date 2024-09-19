@@ -7,7 +7,7 @@
   const {validateCreateUser,validateUpdateUser} = require('../validators/userValidator.js');
   require('dotenv').config();
 
-  const validFields = ['name','domain', 'phone', 'email', 'country','password', 'status', 'role', 'payed'];
+  const validFields = ['name','domain', 'phone', 'email', 'country','password', 'status', 'role', 'payed','subscription_id'];
   
   exports.indexUser = async (req, res) => {
 
@@ -43,13 +43,13 @@
   
 
   exports.storeUser = async (req, res) => {
-    console.log(req.body);
+   // console.log(req.body);
     const validationError = validateCreateUser(req.body);
     if (validationError) {
         return res.status(400).json({ error: validationError.mensaje }); // Enviar una respuesta con el mensaje de error de validación
     }
     
-    const { name, phone, email, password, role, status,domain, country,payed } = req.body;
+    const { name, phone, email, password, role, status,domain, country,payed,id_subscription } = req.body;
       
     try {
       await User.crearTabla();
@@ -57,11 +57,11 @@
      if(!!aa) return res.json({error:"Email ya ha sido tomado"});
     const bb = await User.find("domain",domain);
      if(!!bb) return res.json({error:"Dominio ya ha sido tomado"}); 
-     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed);
+     const created = await User.crear(name, domain, phone, email, country, password, role, status, payed, id_subscription? id_subscription:"");
      await createDatabase(domain);
      await fixDatabase(domain);
 
-     await subdomains();
+    // await subdomains();
      const finded = await User.find('id',created.insertId);
 
      const main = process.env.MAIN_DOMAIN;
@@ -77,6 +77,7 @@
         pais: finded.country,
         role: finded.role,
         payed: finded.payed,
+        id_subscription:finded.id_subscription?finded.id_subscription:"" 
         // Puedes incluir más campos del inquilino aquí si los deseas
       },
 //      dominio: `${nombre}.${main}`, // Reemplaza tudominio.com con tu dominio real

@@ -9,3 +9,6 @@ app/notifications/sessions/
 
 vercel
 
+.env
+
+app/utils/subdominios.json

@@ -1,11 +1,12 @@
 exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
 
     const itemsPerPage=250;
+    
+    const separados = asignaciones.filter(obj => obj.status === "separado").map(obj => Number(obj.number));
+const pagados = asignaciones.filter(obj => obj.status === "pagado").map(obj => Number(obj.number));
 
-    const separados = asignaciones.filter(obj => obj.status==="separado").map(obj => obj.number);
-    const pagados = asignaciones.filter(obj => obj.status==="pagado").map(obj => obj.number);
     //const totalNums=Number(raffle.numbers);
-    const totalNums=10000;
+    const totalNums=raffle.numbers;
     const price=raffle.price;
     const raffleID= raffle.id;
    
@@ -23,9 +24,9 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
 
     const Lista = setLista();
   //  console.log(Lista);
-    console.log(token);
-    console.log(raffle);
-    console.log(userID);
+//    console.log(token);
+  //  console.log(raffle);
+  //  console.log(userID);
 
 
     const script = `
@@ -40,8 +41,11 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                 const raffleID=${raffleID};
            
               
-                const pagados = '${pagados}';
-                const separados = '${separados}';
+                const pagadosStr = '${pagados}';
+              
+                const separadosStr = '${separados}';
+                const pagados = pagadosStr.split(',').map(Number);
+                  const separados = separadosStr.split(',').map(Number);
                 const itemsPerPage = ${itemsPerPage};
                 let selectedNumbers=[];
                 const totalPages = Math.ceil(totalNums / itemsPerPage);
@@ -49,10 +53,14 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                 let listV = false;
                 let total =0;
                 let lista = ${JSON.stringify(Lista)};
-                console.log(lista);
-                console.log(pagados);
+//                console.log(lista);
+               // console.log(pagados);
                 let firstSection=true;
-                console.log(userID);
+            //    console.log(userID);
+             //   console.log('pagados',pagados);
+             //   console.log('separados',separados);
+//                console.log('Tipo de separados:', Array.isArray(separados)); // Debería ser true
+
         
 
             
@@ -120,7 +128,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                     
                         try {
-                        const response = await fetch("http://192.168.1.83:3000/rifa/assignNumbers/"+raffleID, {
+                        const response = await fetch("https://app.megawins.com.co/rifa/assignNumbers/"+raffleID, {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
@@ -149,7 +157,7 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                     
                         try {
-                        const response = await fetch("http://192.168.1.83:3000/comprador/store", {
+                        const response = await fetch("https://app.megawins.com.co/comprador/store", {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
@@ -363,64 +371,68 @@ exports.generateDynamicScript = (token, raffle  , asignaciones,userID) => {
                     
                 };
 
-               const renderCell = (number) => {
-                    const cell = document.createElement('div');
-                    cell.id='cell-'+number;
-                    if(pagados.includes(number)){
-                      cell.classList.add('assignedCell');
-                    }else   if(separados.includes(number)){
-                      cell.classList.add('reservedCell');
-                    } else{
-                     cell.classList.add('cell');
-                    }
-                   
+        const renderCell = (number) => {
+          const nn= Number(number);
+            // Crear el contenedor de la celda
+            const cell = document.createElement('div');
+            cell.id = 'cell-' + number;
 
-                    const textCell = document.createElement('p');
-                    textCell.classList.add('cellText')
-                    textCell.innerText = number;
+            // Determinar la clase según el estado
+            if (pagados.includes(nn)) {
+                cell.classList.add('assignedCell');
+//                   cell.classList.add('cell');
+         //   console.log('celda es asignada',number);
+                
+            } else if (separados.includes(nn)) {
+                cell.classList.add('reservedCell');
+  //                 cell.classList.add('cell');
+            } else {
+                cell.classList.add('cell');
 
-                    cell.appendChild(textCell);
+                // Añadir eventos solo si la celda no está pagada ni separada
+                cell.addEventListener('click', () => select(number));
+                cell.addEventListener('mouseenter', () => cell.classList.toggle('cell_hover', true));
+                cell.addEventListener('mouseleave', () => cell.classList.toggle('cell_hover', false));
+            }
 
-                    if (!pagados.includes(number) && !separados.includes(number)) {
-                        cell.addEventListener('click', () => select(number));
-                          cell.addEventListener('mouseenter', () => {
-                            cell.classList.remove('cell');
-                            cell.classList.add('cell_hover');
-                            });
-                        cell.addEventListener('mouseleave', () => {
-                            cell.classList.remove('cell_hover');
-                            cell.classList.add('cell');
-                            });
+            // Crear y agregar el texto de la celda
+            const textCell = document.createElement('p');
+            textCell.classList.add('cellText');
+            textCell.innerText = number;
+            cell.appendChild(textCell);
+
+    return cell;
+};
 
 
+    
+const renderMatrix = (startNumber) => {
+  //  console.log("Start Number:", startNumber); // Asegúrate de que el número inicial es correcto
 
-                    }
-                        
-                    
-                    return cell;
-                };
+    const matrix = document.createElement('div');
+    matrix.classList.add('matrix');
+    matrix.style.display = 'flex'; // Asegúrate de que el contenedor de la matriz tiene el estilo adecuado
+    matrix.style.flexDirection = 'column'; // Asegúrate de que la matriz se organiza en columnas
 
-                const renderMatrix = (startNumber) => {
-                    const matrix = document.createElement('div');
-                    matrix.classList.add('matrix');
-           
+    for (let i = 0; i < numCeldas; i++) {
+        const row = document.createElement('div');
+        row.classList.add('row');
+        row.style.display = 'flex'; // Asegúrate de que las filas se muestran como flex
+        row.style.flexDirection = 'row'; // Asegúrate de que las celdas están en una fila
 
-                    for (let i = 0; i < numCeldas; i++) {
-                        const row = document.createElement('div');
-                        row.classList.add('row');
-                        row.style.display = 'flex'; // Ensure rows display as flex
-                        row.style.flexDirection = 'row'; // Display cells in row layout
+        for (let j = 0; j < numCeldas; j++) {
+            const number = startNumber + i * numCeldas + j;
+            if (number <= totalNums) {
+//                console.log("Rendering Cell Number:", number); // Verifica que los números de las celdas son correctos
+                row.appendChild(renderCell(number));
+            }
+        }
+        matrix.appendChild(row);
+    }
+    return matrix;
+};
 
-                        for (let j = 0; j < numCeldas; j++) {
-                            const number = startNumber + i * numCeldas + j;
-                            if (number <= totalNums) {
-                                row.appendChild(renderCell(number));
-                            }
-                        }
-                        matrix.appendChild(row);
-                    }
-                    return matrix;
-                };
+
                 const RenderListPaginations = () => {
                                 const list = document.createElement('div');
                                 list.id= "container-list";

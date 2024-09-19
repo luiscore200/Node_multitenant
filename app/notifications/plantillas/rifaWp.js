@@ -86,6 +86,48 @@ Recuerda que para poder reclamar un premio en específico, tu número debe haber
 Gracias por participar en nuestra rifa y ¡buena suerte!
 `;
   };
+
+
+
+
+
+  exports.rifaRecordatorioPagoWhatsApp = (asignacion, premios2) => {
+    const premios = premios2;
+    let premiosTexto = '';
+  
+    if (Array.isArray(premios)) {
+      premiosTexto = premios.map(premio => {
+        return `
+          📌 *Descripción*: ${premio.descripcion}
+          🎟️ *Lotería*: ${premio.loteria}
+          📅 *Fecha*: ${premio.fecha}
+  `;
+      }).join('');
+    } else {
+      premiosTexto = 'No se encontraron premios válidos.';
+    }
+  
+    return `
+  *¡Recordatorio de Pago, ${asignacion.purchaser_name}!*
+  
+  Tienes números pendientes de pago.
+  
+  Para hacer válida tu participación en la rifa, debes cancelar el valor de estos números.
+  
+  Estos números serán válidos para la rifa de los siguientes premios:
+  
+  ${premiosTexto}
+  
+  ⚠️ *Recuerda*: Si no realizas el pago, no podrás participar en la rifa ni reclamar premios con los numeros correspondientes.
+  
+  Gracias por tu atención, esperamos que completes tu participación pronto.
+  `;
+  };
+  
+
+
+
+
   
   exports.invitacionRifaWhatsApp = (comprador, currentRifa, url) => {
     const premios = currentRifa.prizes.map((premio, index) => {
@@ -109,4 +151,36 @@ Haz clic en el siguiente enlace para obtener más información y participar:
 
 ¡No pierdas esta oportunidad de ganar increíbles premios!
 `;
+};
+
+
+exports.asignacionEliminadaWhatsApp = (datos, rifa) => {
+  let premiosTexto = '';
+
+  if (Array.isArray(rifa.prizes) && rifa.prizes.length > 0) {
+    premiosTexto = rifa.prizes.map(premio => {
+      return `
+        📌 *Descripción*: ${premio.descripcion}
+        📅 *Lotería*: ${premio.loteria}
+        📅 *Fecha*: ${premio.fecha}`;
+    }).join('\n');
+  } else {
+    premiosTexto = 'No se encontraron premios válidos para esta rifa.';
+  }
+
+  return `
+*Notificación de Eliminación*
+
+Estimado/a *${datos.purchaser_name}*,
+
+Le informamos que su asignación número *${datos.number}* en la rifa *${rifa.tittle}* ha sido eliminada.
+
+Esta rifa cuenta con los siguientes premios:
+
+${premiosTexto}
+
+Este mensaje es automático. Si tiene alguna duda o consulta sobre esta situación, por favor, póngase en contacto con su proveedor.
+
+Gracias por su comprensión.
+  `;
 };

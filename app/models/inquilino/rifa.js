@@ -50,14 +50,37 @@ class Rifa {
         `SELECT * FROM ${propietario}.raffle WHERE ${key} = ?`,
         [value]
       );
-      if (results.length === 0) {
-        throw new Error(`No se encontró ninguna rifa con ${key} = ${value}`);
-      }
+      
       return results[0];
     } catch (error) {
       throw error;
     }
   }
+
+  static async find(propietario, key, value) {
+    try {
+        const [results] = await connection.execute(
+            `SELECT * FROM ${propietario}.raffle WHERE ${key} = ?`,
+            [value]
+        );
+        
+        return results[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+static async countRaffles(propietario) {
+    try {
+        const [results] = await connection.execute(
+            `SELECT COUNT(*) AS total FROM ${propietario}.raffle`
+        );
+        return results[0].total;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
   static async update(propietario, id, updates) {
     try {

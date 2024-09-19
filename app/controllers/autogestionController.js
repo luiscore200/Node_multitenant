@@ -15,28 +15,36 @@ const whatsappService2= require("../notifications/whatsappService2");
 const plantillasEmail = require('../notifications/plantillas/rifaMails');
 const plantillasWP = require("../notifications/plantillas/rifaWp");
 const acortador = require("../utils/urlAcortador");
+const Subscriptions = require('../models/suscripciones');
 
 
 
 exports.generateToken = async(req, res) => {
 
     const{decodedToken}= req;
+    if(!decodedToken){return res.json({error:"Dominio no encontrado"});}
     
   //  http://localhost:3000/generate?id=1&user=3 ejemplo de query con user de la base de datos
 
     const {id} =req.query; //user,tokens
-    const url = `${process.env.HOST}:${process.env.PORT}`;    
+   // const url = `${process.env.HOST}:${process.env.PORT}`;    
+    const url = `${process.env.MAIN_DOMAIN}`
     const urls=[];
     const validationResult = validator.validateUserAndTokens(req.query);
     if (validationResult.mensaje) {return res.json({ error: validationResult.mensaje });}
    
     const { users, tokens } = validationResult;
+   try {
+    const sub = await Subscriptions.find("sub_id",decodedToken.id_subscription);
+
+    if(sub && !sub.share){return res.json({error:"Tu plan actual no permite compartir"});}
+
     const conf= await Config.index(decodedToken ? decodedToken.dominio : "numero1Dominio");
     const currentRifa =await Rifa.find(decodedToken?decodedToken.dominio:"numero1Dominio","id",id);
-    currentRifa.prizes = JSON.parse(currentRifa.prizes);
+  //  currentRifa.prizes = JSON.parse(currentRifa.prizes);
    // console.log(validationResult);
    //console.log(currentRifa);
-   console.log(conf);
+   //console.log(conf);
 
     if(!users && tokens){
     
@@ -49,7 +57,7 @@ exports.generateToken = async(req, res) => {
         const token = JWT.generateToken(payload, '24h');
 
        
-        urls.push(`http://${url}/${token}`);
+        urls.push(`https://${url}/${token}`);
 
        }    
      //  console.log(urls);
@@ -71,23 +79,24 @@ exports.generateToken = async(req, res) => {
             };
             const token = JWT.generateToken(payload, '24h');
             
-            const obj = `http://${url}/autogestion/${token}`;
+            const obj = `${url}/autogestion/${token}`;
             urls.push(obj);
             
             const comprador = compradores.find(element => element.id === users[index]);
 
             if (comprador) {
-                if(conf){
-                  if(conf.email_status===1 && conf.email_verified===1){
+                if(conf && sub!==null){
+
+                  if(sub.email && conf.email_status && conf.email_verified){
                     sendMail2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",comprador.email,`Invitacion de juego `,plantillasEmail.rifaInvitacion(comprador,currentRifa,obj));                    
                   }
-                  if(conf.email_status===0 || conf.email_verified===0){
+                  if(!sub.email || !conf.email_status || !conf.email_verified){
                     sendMail.addMessageToQueue(comprador.email,`Invitacion de juego `,plantillasEmail.rifaInvitacion(comprador,currentRifa,obj));          
                   }
-                  if( conf){                
+                  if(sub.whatsapp===true || conf.phone_status && conf.phone_verified){                
 
                     const tokenAcortado = await acortador.insertToken(obj);
-                    const urlAcortado = `http://${url}?st=${tokenAcortado}`;
+                    const urlAcortado = `${url}?st=${tokenAcortado}`;
                     whatsappService2.addMessageToQueue(decodedToken ? decodedToken.dominio : "numero1Dominio",comprador.phone,plantillasWP.invitacionRifaWhatsApp(comprador,currentRifa,urlAcortado));               
                   }
               }else{
@@ -95,17 +104,27 @@ exports.generateToken = async(req, res) => {
               } 
 
             }
-           }    
+         }    
      
-                  if(conf){
-                    if(conf.email_status===1 && conf.email_verified===1){
+                  if(conf && sub!==null){
+
+                   //////////////////
+                    if(!sub.whatsapp && conf.phone_status){
+                      Inquilino.update(decodedToken.id,{phone_status:false})
+                    }
+                    if(!sub.email && conf.email_status){
+                      Inquilino.update(decodedToken.id,{email_status:false})
+                    }
+                //////////////////////
+
+                    if(sub.email && conf.email_status && conf.email_verified){
                       sendMail2.sendAll();
                     }
-                    if(conf.email_status===0 || conf.email_verified===0){
+                    if(!sub.email || !conf.email_status || !conf.email_verified){
                       sendMail.sendAll();
                     }
-                    if( conf.phone_verified ===1 && conf.phone_status ===1){
-                      console.log("aaa");
+                    if(sub.whatsapp && conf.phone_verified && conf.phone_status){
+                     // console.log("aaa");
                       whatsappService2.sendAll();
                     }
               }else{
@@ -114,6 +133,11 @@ exports.generateToken = async(req, res) => {
      
               return res.json({mensaje:"se han enviado la invitaciones"})
     }   
+
+   } catch (error) {
+           
+    return res.json({error:"Error al enviar las invitaciones"});
+   }
 
 };
 
@@ -191,7 +215,7 @@ exports.autogestion =async (req, res) => {
       await Asignaciones.eliminarAntiguasSeparadas(dominio? dominio:"numero1Dominio");
       
       const asignaciones = await Asignaciones.findByRaffle(dominio? dominio:"numero1Dominio",raffle);
- //     console.log(asignaciones);
+    //  console.log(asignaciones);
 
       const rifa = await Rifa.find(dominio? dominio:"numero1Dominio","id",raffle);
 
@@ -202,14 +226,6 @@ exports.autogestion =async (req, res) => {
      
          
   
-        const  totalNumbers= 10000;
-        const price= 1000;
-        const totalNums = parseInt(totalNumbers, 10);
-
-        if (isNaN(totalNums)) {
-            return res.status(400).send('"totalNumbers" deben ser números.');
-        }
-
         // Lee el archivo HTML
         let html = fs.readFileSync(path.join(__dirname, '../src/public', 'index.html'), 'utf8');
         const script =script2.generateDynamicScript(token,  rifa,    asignaciones,    user?user:null);

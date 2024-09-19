@@ -7,18 +7,19 @@ class User {
   static async crearTabla() {
     try {
       await connection.execute(`
-        CREATE TABLE IF NOT EXISTS  users (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          domain VARCHAR(255) NOT NULL UNIQUE,
-          phone VARCHAR(255 ) NOT NULL ,
-          email VARCHAR(255) NOT NULL UNIQUE,
-          country VARCHAR(255) NOT NULL,
-          password VARCHAR(255) NOT NULL,
-          status BOOLEAN NOT NULL  DEFAULT '0',
-          role VARCHAR(255) NOT NULL  DEFAULT 'user' CHECK (role IN ('user', 'admin')), 
-          payed BOOLEAN NOT NULL DEFAULT '0'
-        )
+      CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  domain VARCHAR(255) NOT NULL UNIQUE,
+  phone VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  country VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  status BOOLEAN NOT NULL DEFAULT '0',
+  role VARCHAR(255) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+  payed BOOLEAN NOT NULL DEFAULT '0',
+  id_subscription VARCHAR(255) DEFAULT ""
+);
       `);
       console.log('Tabla  users creada o ya existente');
     } catch (error) {
@@ -28,13 +29,14 @@ class User {
   }
 
 
-  static async crear(name,domain, phone, email , country, password, role,  status, payed) {
+  static async crear(name,domain, phone, email , country, password, role,  status, payed,suscripcion) {
     let localStatus;
     let localRole;
     let localPassword;
     let localPayed;
+    let localSuscripcion;
     try {
-      if(role && role=="admin"||role=="user"){
+      if(role && role==="admin"||role==="user"){
         localRole=role;
       }else{
         localRole="user";
@@ -46,7 +48,7 @@ class User {
         localPassword="password";
       }
 
-      if(status==true || status==false ){
+      if(status===true || status===false ){
         localStatus = status;
       }else{
         localStatus = true;
@@ -56,10 +58,15 @@ class User {
       }else{
         localPayed = true;
       }
+      if(!suscripcion){
+        localSuscripcion="";
+      }else{
+        localSuscripcion=suscripcion;
+      }
 
       const hashedPassword = await hashPassword(localPassword);
-      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)',
-         [name, domain, phone, email, country, hashedPassword, localStatus, "user", localPayed]);
+      const [results] = await connection.execute('INSERT INTO  users (name, domain, phone, email, country, password, status, role, payed,id_subscription) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)',
+         [name, domain, phone, email, country, hashedPassword, localStatus, "user", localPayed,localSuscripcion]);
       return results;
     } catch (error) {
       throw error;

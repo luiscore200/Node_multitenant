@@ -6,10 +6,18 @@ function validateUpdateRifa(data) {
         if (typeof titulo !== 'string') {
             return { error: 'El título debe ser una cadena de texto' };
         }
-        if (titulo.length < 6 || titulo.length > 60) {
-            return { error: 'El título debe tener entre 6 y 60 caracteres' };
+        if (titulo.length===0) {
+           
+                return { error: 'El titulo es requerido' };
+            
         }
+        if (titulo.length>60) {
+           
+            return { error: 'El titulo es demaciado largo' };
+        
     }
+        }
+    
 
     // Validar precio
     if (precio) {
@@ -26,8 +34,8 @@ function validateUpdateRifa(data) {
         if (typeof pais !== 'string') {
             return { error: 'El país debe ser una cadena de texto' };
         }
-        if (pais.length < 4 || pais.length > 60) {
-            return { error: 'El país debe tener entre 4 y 60 caracteres' };
+        if (pais.length ===0) {
+            return { error: 'El campo pais es requerido' };
         }
     }
 
@@ -37,7 +45,7 @@ function validateUpdateRifa(data) {
             return { error: 'El número debe ser una cadena de texto' };
         }
         if (numeros.length === 0) {
-            return { error: 'El número no puede estar vacío' };
+            return { error: 'El campo numero es requerido' };
         }
     }
 
@@ -46,7 +54,11 @@ function validateUpdateRifa(data) {
         if (typeof tipo !== 'string') {
             return { error: 'El tipo debe ser una cadena de texto' };
         }
+        if (tipo.length === 0) {
+            return { error: 'El campo tipo es requerido' };
+        }
     }
+    
 
     // Validar premios
     if (premios) {
@@ -189,7 +201,7 @@ function assignNumbersValidator(data) {
         }
     }
     
-
+ /*
     // Validar pais
     if (method) {
         if(!method){
@@ -199,7 +211,7 @@ function assignNumbersValidator(data) {
             return { mensaje: 'El país debe ser una cadena de texto' };
         }
        
-    }
+    }*/
 
 
     return null;

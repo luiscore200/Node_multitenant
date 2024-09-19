@@ -77,6 +77,9 @@ const limpiarMensajesAntiguos = () => {
     
 };
 
+exports.Init = async()=>{
+    credentials();
+}
 
 // Función para enviar correos electrónicos
 exports.sendMail = async (to, subject, html) => {
@@ -141,6 +144,7 @@ exports.sendAll = async () => {
                     console.log('Problema de sesión, reenviando al final de la cola.');
                            console.log('No autorizado, se notificara y reintentara cada media hora....');
                            notificar();
+                         //  transporter=null;
                            await new Promise(resolve => setTimeout(resolve, 1800000));
               
                 } else {
